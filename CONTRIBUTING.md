@@ -20,7 +20,7 @@ Other test projects require local Unity/game references; pass `-p:GameDir='your 
 ## Release preparation
 
 ```powershell
-.\packaging\Build-Release.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC' -Version '0.1.0-beta.1' -Draft
+.\packaging\Build-Release.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC' -Version '1.0.0' -Draft
 ```
 
 This exports an explicit source tree into ignored `artifacts`, builds it, checks release hygiene and creates a mod ZIP/checksum. It does not publish, deploy or launch the game. `-Draft` marks an unapproved package nonpublic; omit it only after release review.

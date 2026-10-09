@@ -2,7 +2,7 @@
 
 An unofficial Windows PCVR mod for CULTIC, using OpenXR, BepInEx and UUVR. Play Chapter One with head tracking, stereo rendering, motion-controller aiming, controller-mounted weapon artwork, roomscale movement, physical crouching, a wrist menu/HUD and in-game VR Options.
 
-Release preparation is in progress. No public release has been published from this repository yet.
+Version 1.0.0 covers Chapter One. See the known limitations below for support scope and outstanding issues.
 
 ## Requirements and compatibility
 
