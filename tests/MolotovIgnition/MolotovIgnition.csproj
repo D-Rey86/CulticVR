@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/CulticVR.AimPreview/IgnitionContactMath.cs" Link="IgnitionContactMath.cs" />
+    <Compile Include="../../src/CulticVR.AimPreview/ClothContactMath.cs" Link="ClothContactMath.cs" />
+    <Compile Include="../../src/CulticVR.AimPreview/MolotovCloth.cs" Link="MolotovCloth.cs" />
+    <Reference Include="UnityEngine.CoreModule"><HintPath>G:/Games/Steam/steamapps/common/CULTIC/CULTIC_Data/Managed/UnityEngine.CoreModule.dll</HintPath><Private>true</Private></Reference>
+  </ItemGroup>
+</Project>

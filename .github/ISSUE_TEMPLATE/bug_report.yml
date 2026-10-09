@@ -1,0 +1,28 @@
+name: Bug report
+description: Report a problem with the Chapter One VR mod
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Mod release and CULTIC version
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Headset, OpenXR runtime, GPU, CPU, and Windows version
+      description: Include connection method, refresh rate and render resolution if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include the level or menu, steps to reproduce, and whether one or both eyes are affected. A long test session is not required.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Additional information
+      description: List other mods or OpenXR layers. If attaching BepInEx/LogOutput.log, review it for personal paths or other private information first.

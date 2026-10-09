@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><GameDir>G:\Games\Steam\steamapps\common\CULTIC</GameDir></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/CulticVR.WorldStereoTrial/PhysicalLocomotionMath.cs" Link="PhysicalLocomotionMath.cs" />
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.CoreModule.dll</HintPath><Private>true</Private></Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <GameDir>G:\Games\Steam\steamapps\common\CULTIC</GameDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/CulticVR.OpenXRControllers/OptionsStickRouter.cs" Link="OptionsStickRouter.cs" />
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.CoreModule.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>$(GameDir)\CULTIC_Data\Managed\Unity.InputSystem.dll</HintPath><Private>true</Private></Reference>
+  </ItemGroup>
+</Project>

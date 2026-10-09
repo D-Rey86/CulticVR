@@ -1,0 +1,9 @@
+sandbox/
+sandbox-uuvr/
+tools/
+deployment/
+**/bin/
+**/obj/
+*.log
+artifacts/
+diagnostics/

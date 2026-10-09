@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GameDir>$(MSBuildThisFileDirectory)..\..\sandbox-uuvr\CULTIC</GameDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Uuvr.XR.Management"><HintPath>$(GameDir)\BepInEx\plugins\Uuvr.XR.Management.dll</HintPath><Private>false</Private></Reference>
+    <Compile Include="..\CulticVR.OpenXRControllers\OpenXRControllersPlugin.cs" Link="OpenXRControllersPlugin.cs" />
+    <Compile Include="..\CulticVR.OpenXRControllers\ControllerGamepadBridge.cs" Link="ControllerGamepadBridge.cs" />
+    <Compile Include="..\CulticVR.OpenXRControllers\OptionsStickRouter.cs" Link="OptionsStickRouter.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\WorldStereoTrialPlugin.cs" Link="WorldStereoTrialPlugin.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\PoseRotationFastPath.cs" Link="PoseRotationFastPath.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\HiddenWorldGeometry.cs" Link="HiddenWorldGeometry.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\StereoProjectionMath.cs" Link="StereoProjectionMath.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\ScopeSightingMath.cs" Link="ScopeSightingMath.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\ScopeStereoMath.cs" Link="ScopeStereoMath.cs" />
+    <Compile Include="..\CulticVR.UiTrial\UiTrialPlugin.cs" Link="UiTrialPlugin.cs" />
+    <Compile Include="..\CulticVR.AimPreview\AimPreviewPlugin.cs" Link="AimPreviewPlugin.cs" />
+    <Compile Include="..\CulticVR.AimPreview\WristQuickMenu.cs" Link="WristQuickMenu.cs" />
+    <Compile Include="..\CulticVR.AimPreview\WristStatusHud.cs" Link="WristStatusHud.cs" />
+    <Compile Include="..\CulticVR.AimTrial\AimTrialPlugin.cs" Link="AimTrialPlugin.cs" />
+    <Compile Include="..\CulticVR.AimTrial\ControllerReticle.cs" Link="ControllerReticle.cs" />
+    <Compile Include="..\CulticVR.AimTrial\PhysicalDynamiteThrow.cs" Link="PhysicalDynamiteThrow.cs" />
+    <Compile Include="..\CulticVR.AimTrial\BazookaAim.cs" Link="BazookaAim.cs" />
+    <Compile Include="..\CulticVR.AimTrial\BazookaFiringPatch.cs" Link="BazookaFiringPatch.cs" />
+    <Compile Include="..\CulticVR.AimTrial\DisposableAim.cs" Link="DisposableAim.cs" />
+    <Compile Include="..\CulticVR.AimTrial\DisposableFiringPatch.cs" Link="DisposableFiringPatch.cs" />
+    <Compile Include="..\CulticVR.AimPreview\WeaponMuzzle.cs" Link="WeaponMuzzleArtwork.cs" />
+    <Compile Include="..\CulticVR.AimTrial\WeaponMuzzle.cs" Link="WeaponMuzzle.cs" />
+    <Compile Include="..\CulticVR.AimTrial\WeaponSpawnPatch.cs" Link="WeaponSpawnPatch.cs" />
+    <Compile Include="..\CulticVR.AimPreview\WristPointerBounds.cs" Link="WristPointerBounds.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\HeadCollision.cs" Link="HeadCollision.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\HeadCollisionSolver.cs" Link="HeadCollisionSolver.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\PhysicalLocomotion.cs" Link="PhysicalLocomotion.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\PhysicalLocomotionMath.cs" Link="PhysicalLocomotionMath.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\VrSettings.cs" Link="VrSettings.cs" />
+    <Compile Include="..\CulticVR.UiTrial\VrMenu.cs" Link="VrMenu.cs" />
+    <Compile Include="..\CulticVR.AimPreview\WeaponSettings.cs" Link="WeaponSettings.cs" />
+    <Compile Include="..\CulticVR.AimPreview\WeaponSpriteMirror.cs" Link="WeaponSpriteMirror.cs" />
+    <Compile Include="..\CulticVR.AimPreview\MolotovIgnition.cs" Link="MolotovIgnition.cs" />
+    <Compile Include="..\CulticVR.AimPreview\IgnitionContactMath.cs" Link="IgnitionContactMath.cs" />
+    <Compile Include="..\CulticVR.AimPreview\ClothContactMath.cs" Link="ClothContactMath.cs" />
+    <Compile Include="..\CulticVR.AimPreview\MolotovCloth.cs" Link="MolotovCloth.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\VrStereoMath.cs" Link="VrStereoMath.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\VrHandPose.cs" Link="VrHandPose.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\ArtificialLocomotion.cs" Link="ArtificialLocomotion.cs" />
+    <Compile Include="..\CulticVR.WorldStereoTrial\VrBrightness.cs" Link="VrBrightness.cs" />
+    <Compile Include="..\CulticVR.UiTrial\MenuBackground.cs" Link="MenuBackground.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Unity.Postprocessing.Runtime"><HintPath>$(GameDir)\CULTIC_Data\Managed\Unity.Postprocessing.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx"><HintPath>$(GameDir)\BepInEx\core\BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(GameDir)\BepInEx\core\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(GameDir)\CULTIC_Data\Managed\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.XRModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.XRModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.VRModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.VRModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AnimationModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AudioModule"><HintPath>$(GameDir)\CULTIC_Data\Managed\UnityEngine.AudioModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>$(GameDir)\CULTIC_Data\Managed\Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Netcode.Runtime"><HintPath>$(GameDir)\CULTIC_Data\Managed\Unity.Netcode.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(GameDir)\CULTIC_Data\Managed\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Uuvr"><HintPath>$(GameDir)\BepInEx\plugins\Uuvr.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Uuvr.XR.OpenXR"><HintPath>$(GameDir)\BepInEx\plugins\Uuvr.XR.OpenXR.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>
