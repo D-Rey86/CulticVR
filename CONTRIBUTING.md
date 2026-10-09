@@ -13,18 +13,19 @@ The supported `CULTIC_Data/Managed/Assembly-CSharp.dll` SHA-256 is `0AC77697A3F0
 
 ## Tests
 
-`dotnet run --project tests/MenuBackground -c Release` needs no proprietary assemblies. Public CI runs this managed lifetime test and parses packaging scripts; it does not claim full game/VR coverage.
+`dotnet run --project tests/MenuBackground -c Release` needs no proprietary assemblies. Public CI runs this managed lifetime test, parses packaging scripts, and compiles/runs the native installer's argument quoting, Steam library parsing and offscreen layout checks. It does not claim full game/VR coverage.
 
 Other test projects require local Unity/game references; pass `-p:GameDir='your game folder'`. ScopeSightingMath, ScopeStereoMath, NativeTitleReplay and OptionsStickRouter additionally use private historical capture receipts. BazookaFiringPatch uses a historical compiled baseline. These inputs are not distributed, so those replays cannot run from a fresh public clone alone. Static checks and managed Unity stand-ins do not establish native rendering correctness.
 
 ## Release preparation
 
 ```powershell
+.\packaging\Fetch-ReleaseInputs.ps1
 .\packaging\Build-Release.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC' -Version '1.0.0' -Draft
 ```
 
 This exports an explicit source tree into ignored `artifacts`, builds it, checks release hygiene and creates a mod ZIP/checksum. It does not publish, deploy or launch the game. `-Draft` marks an unapproved package nonpublic; omit it only after release review.
 
-Dependency archives are downloaded directly from upstream, not repackaged. Development history contains personal paths, author information and investigation material; use the reviewed source export for a new public repository while preserving the development repository. Publish the exact source corresponding to each release binary.
+Maintainers fetch hash-pinned dependencies and source snapshots before building. The player ZIP bundles the required components, notices and GPL/LGPL sources; it works offline. The native Windows Forms installer uses the tested PowerShell transaction engine internally with no terminal window or command entry. Development history contains personal paths, author information and investigation material; use the reviewed source export for a new public repository while preserving the development repository. Publish the exact source corresponding to each release binary.
 
 Describe changes with evidence, affected systems and validation. Preserve verified behavior. Avoid headset-specific optics assumptions, repeated object searches, per-frame logging and allocations. Check NVIDIA and AMD implications. Do not change visuals incidentally while investigating performance. Preserve saves/configurations and do not launch games automatically.

@@ -2,46 +2,34 @@
 
 An unofficial Windows PCVR mod for CULTIC, using OpenXR, BepInEx and UUVR. Play Chapter One with head tracking, stereo rendering, motion-controller aiming, controller-mounted weapon artwork, roomscale movement, physical crouching, a wrist menu/HUD and in-game VR Options.
 
-Version 1.0.0 covers Chapter One. See the known limitations below for support scope and outstanding issues.
+**Chapter One only for now. Chapter Two support is planned and will be worked on separately.** Version 1.0.0 does not support Chapter Two.
 
 ## Requirements and compatibility
 
 - A legitimate Windows x64 Steam installation of CULTIC. The installer checks the exact supported game files and refuses an untested game update.
 - A PCVR headset with a working OpenXR runtime selected by its headset software. The integration uses ordinary two-eye stereo, UUVR's OpenXR backend, multipass rendering and `RelativeTransform` tracking.
-- BepInEx **5.4.23.5** (Windows x64) and UUVR **0.4.0** (Mono Modern), downloaded below.
-- Windows PowerShell 5.1 or PowerShell 7 for installation. Players do not need the .NET SDK.
+- Windows 10/11. The download includes BepInEx **5.4.23.5**, UUVR **0.4.0**, and required x64 OpenXR components.
+- No separate mod-loader downloads, terminal commands or .NET SDK are needed.
 
 Headset testing has used Quest 3 through Virtual Desktop with an NVIDIA RTX 5070 Ti. The code uses runtime-provided eye geometry and resolution; other headsets, AMD GPUs and advanced quad-view/foveated configurations have not been visually certified. Virtual Desktop is not a code-level requirement. Chapter Two DLC and multiplayer are outside this release's supported scope.
 
 ## Installation
 
-These instructions apply to the prepared release ZIP, not GitHub's automatic source-code ZIP.
+1. Download **CulticVR-1.0.0-windows-x64.zip** from Releases and **extract the entire ZIP**.
+2. Close CULTIC, then double-click **Install CulticVR.exe** in the extracted folder.
+3. The installer finds CULTIC in your Steam libraries. If it does not, click **Browse** and select `CULTIC.exe` (Steam → CULTIC → Manage → Browse local files).
+4. Click **Install / Update**. Everything needed for the mod is already included; installation works offline.
+5. Make your headset available with its OpenXR runtime selected, then launch CULTIC through Steam.
 
-1. Close CULTIC. Start from a clean installation without another BepInEx/UUVR setup. The installer refuses conflicting files.
-2. Extract the CulticVR release ZIP to a folder you can keep for updates/removal.
-3. Download `BepInEx_win_x64_5.4.23.5.zip` from the [BepInEx release](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5), and `uuvr-mono-modern.zip` from the [UUVR release](https://github.com/Raicuparta/uuvr/releases/tag/v0.4.0). Place both ZIPs, still compressed, beside `Manage-CulticVR.ps1`. The script checks their hashes against the tested archives.
-4. In PowerShell opened in that extracted folder, run the following, replacing the example with your Steam game folder (Steam → CULTIC → Manage → Browse local files):
-
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File .\Manage-CulticVR.ps1 -Action Install -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC'
-   ```
-
-5. Make the headset available and select its OpenXR runtime, then launch CULTIC through Steam. Installation does not launch the game or change your runtime selection.
-
-The execution-policy option applies to that PowerShell process only. The mod uses the game's installed artwork; game files and assets are not included in the download.
+Start with a clean game installation. The installer refuses conflicting existing mod files. It does not launch the game or change your OpenXR runtime selection. Keep the extracted download for updating or removing the mod. GitHub's automatic source-code ZIP is for developers, not installation.
 
 ## Updating and removing
 
-With CULTIC closed, extract the new release and use its script:
+Close CULTIC and run **Install CulticVR.exe** again. **Install / Update** installs a newer mod DLL when an existing installation is detected. **Uninstall** removes the recorded mod files while retaining saves and preferences. For an update, use the installer from the new download.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Manage-CulticVR.ps1 -Action Update -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC'
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Manage-CulticVR.ps1 -Action Remove -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC'
-```
+Updates preserve the previous DLL and its matching install record under `CulticVR-backups` in the game folder. Keep `CulticVR-install.json` there; it identifies installed files even if the extracted download moves. Logs, backups and empty folders remain after removal. A file modified by another mod is left for inspection rather than overwritten.
 
-Update replaces the mod DLL only and preserves a rollback DLL plus its matching install record under `CulticVR-backups` in the game folder. Dependency upgrades require separate instructions. Removal deletes only recorded, hash-matching files, including files generated by UUVR on first launch. Saves, preferences, logs, backups and empty folders remain. Keep `CulticVR-install.json` in the game folder; it identifies installed files even if the extracted download moves.
-
-Existing development/manual installations need their original removal procedure before using this package. If a recorded file has been changed by another mod, the script stops for inspection.
+Older development/manual installations need their original removal procedure before using this installer. Dependency upgrades will have explicit instructions when required.
 
 ## Controls and VR Options
 

@@ -12,7 +12,20 @@ CulticVR's own code is offered under GPL-3.0-or-later; see LICENSE. This does no
 
 UUVR source inspected: tag `v0.4.0`, commit `de8e9218f8a9310778f2f57c189bef9ccc8c4dc8`. CulticVR directly references UUVR assemblies.
 
-The mod ZIP contains the project-owned DLL, management script and documentation. Players obtain original dependency ZIPs directly from upstream. It contains no game assets, Unity binaries, dependency archives, decompiled game source or research tools. Any future all-in-one bundle needs a component/license and corresponding-source review.
+The mod ZIP includes the Windows installer, CulticVR, BepInEx and the required UUVR/OpenXR runtime components. License texts are in `licenses`; UUVR and Unity Doorstop source snapshots and source/build references are in `sources`. It contains no CULTIC game assemblies, game artwork, decompiled game source, research tools or personal configurations.
+
+Additional bundled component notices:
+
+- Unity Doorstop 4.5.0 — LGPL-2.1; https://github.com/NeighTools/UnityDoorstop/tree/v4.5.0. Unmodified source archive included; loader remains replaceable.
+- HarmonyX 2.9.0 / Harmony compatibility components — MIT; https://github.com/BepInEx/HarmonyX/tree/v2.9.0 and https://github.com/pardeike/Harmony.
+- Mono.Cecil 0.10.4 — MIT; https://github.com/jbevain/cecil/tree/0.10.4.
+- MonoMod 22.1.29.1 — MIT; https://github.com/MonoMod/MonoMod/tree/v22.01.29.01.
+- AssetsTools.NET 2.0.9 — MIT; https://github.com/nesrak1/AssetsTools.NET.
+- OpenVR / Unity XR OpenVR — Valve BSD licenses; https://github.com/ValveSoftware/openvr/tree/v2.0.10 and https://github.com/ValveSoftware/unity-xr-plugin.
+- OpenXR loader 1.0.20 — Apache-2.0; https://github.com/KhronosGroup/OpenXR-SDK/tree/release-1.0.20.
+- Unity OpenXR 1.4.2 — Unity package terms and its accompanying third-party notices, retained in `licenses`. Distributed as an integrated runtime component of this Unity mod, not relicensed under GPL.
+
+The UUVR archive is repackaged for Windows x64/OpenXR: unused x86 native plugins, `ucrtbased.dll` (Microsoft debug runtime, not redistributable), and the unused legacy `OVRPlugin.dll` are excluded. Remaining files are byte-for-byte upstream originals. Native import inspection found no import/delay-import of the omitted debug/Oculus libraries from the retained x64 plugins; the supported UUVR OpenXR path imports UnityOpenXR. This does not claim support for alternate legacy Oculus backends. `payload/dependencies.json` records the upstream hash, repackaged hash and omitted entries.
 
 Expected upstream archive SHA-256 values:
 

@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$GameDir,
     [string]$Version = '1.0.0',
+    [string]$DependencyDir = (Join-Path (Split-Path -Parent $PSScriptRoot) 'tools'),
     [switch]$Draft
 )
 $ErrorActionPreference = 'Stop'
@@ -10,7 +11,8 @@ if (!$Draft -and !(Test-Path -LiteralPath (Join-Path $repo 'LICENSE'))) { throw 
 $output = Join-Path $repo ('artifacts\' + $Version + '-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
 $sourceRoot = Join-Path $output 'source'
 $package = Join-Path $output 'CulticVR'
-New-Item -ItemType Directory -Path $sourceRoot,$package | Out-Null
+$payload = Join-Path $package 'payload'
+New-Item -ItemType Directory -Path $sourceRoot,$package,$payload | Out-Null
 # Explicit export: research history, captures, personal settings, and proprietary game
 # files never enter this tree. Original repository/history remain untouched.
 foreach ($folder in @('src','tests','packaging','.github')) {
@@ -33,8 +35,14 @@ foreach ($name in @('README.md','LICENSE','THIRD-PARTY-NOTICES.md','CONTRIBUTING
 dotnet build (Join-Path $sourceRoot 'src\CulticVR\CulticVR.csproj') -c Release "-p:GameDir=$GameDir" --nologo
 if ($LASTEXITCODE -ne 0) { throw 'Exported-source build failed.' }
 & (Join-Path $sourceRoot 'Test-CulticVR-Package.ps1') -GameDir $GameDir
-Copy-Item -LiteralPath (Join-Path $sourceRoot 'src\CulticVR\bin\Release\netstandard2.1\CulticVR.dll') -Destination $package
-Copy-Item -LiteralPath (Join-Path $repo 'packaging\Manage-CulticVR.ps1') -Destination $package
+Copy-Item -LiteralPath (Join-Path $sourceRoot 'src\CulticVR\bin\Release\netstandard2.1\CulticVR.dll') -Destination $payload
+Copy-Item -LiteralPath (Join-Path $repo 'packaging\Manage-CulticVR.ps1') -Destination $payload
+& (Join-Path $PSScriptRoot 'Prepare-Dependencies.ps1') -Destination $payload -DependencyDir $DependencyDir
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'licenses') -Destination (Join-Path $package 'licenses') -Recurse
+Copy-Item -LiteralPath (Join-Path $DependencyDir 'release-sources') -Destination (Join-Path $package 'sources') -Recurse
+$compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+& $compiler /nologo /target:winexe /optimize+ /reference:System.Windows.Forms.dll /reference:System.Drawing.dll ("/out:" + (Join-Path $package 'Install CulticVR.exe')) (Join-Path $sourceRoot 'packaging\Installer.cs')
+if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed.' }
 foreach ($name in @('README.md','LICENSE','THIRD-PARTY-NOTICES.md','CONTRIBUTING.md')) {
     $path = Join-Path $repo $name
     if (Test-Path -LiteralPath $path) { Copy-Item -LiteralPath $path -Destination $package }
@@ -58,4 +66,4 @@ try {
 } finally { $archive.Dispose() }
 ((Get-FileHash -LiteralPath $sourceZip -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + [IO.Path]::GetFileName($sourceZip)) | Add-Content -LiteralPath (Join-Path $output 'SHA256SUMS.txt')
 Write-Host "Release preparation: $output"
-Write-Host 'The source folder is a publication staging area, not a repository to push until reviewed. Dependency archives are downloaded separately from upstream.'
+Write-Host 'One-download package includes the installer, pinned runtime components, licenses and dependency source snapshots. No player downloads or commands required.'

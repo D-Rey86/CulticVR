@@ -65,6 +65,12 @@ if ($Action -eq 'Install') {
         @{ Name='BepInEx_win_x64_5.4.23.5.zip'; Prefix=''; Sha='82F9878551030F54657792C0740D9D51A09500EEAE1FBA21106B0C441E6732C4' },
         @{ Name='uuvr-mono-modern.zip'; Prefix='BepInEx\'; Sha='CD9D46E7F6D9D641034BA564617BA51204CA8F26991F7DC36D03CABCE81CFEA6' }
     )
+    $bundleManifest = Join-Path $PSScriptRoot 'dependencies.json'
+    if (Test-Path -LiteralPath $bundleManifest) {
+        $bundle = Get-Content -LiteralPath $bundleManifest -Raw | ConvertFrom-Json
+        if ($bundle.mode -ne 'CulticVR-x64-OpenXR' -or $bundle.uuvrSha256 -notmatch '^[A-Fa-f0-9]{64}$') { throw 'Invalid bundled dependency manifest.' }
+        $archives[1].Sha = $bundle.uuvrSha256
+    }
     $handles = [Collections.Generic.List[IO.Compression.ZipArchive]]::new()
     $plans = [Collections.Generic.List[object]]::new()
     $written = [Collections.Generic.List[string]]::new()

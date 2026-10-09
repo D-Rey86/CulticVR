@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory)][string]$GameDir,
     [Parameter(Mandatory)][string]$BepArchive,
     [Parameter(Mandatory)][string]$UuvrArchive,
-    [Parameter(Mandatory)][string]$ModDll
+    [Parameter(Mandatory)][string]$ModDll,
+    [string]$BundleManifest
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
@@ -17,6 +18,7 @@ foreach ($relative in @('CULTIC.exe','UnityPlayer.dll','CULTIC_Data\Managed\Asse
 }
 Copy-Item -LiteralPath $BepArchive -Destination (Join-Path $package 'BepInEx_win_x64_5.4.23.5.zip')
 Copy-Item -LiteralPath $UuvrArchive -Destination (Join-Path $package 'uuvr-mono-modern.zip')
+if ($BundleManifest) { Copy-Item -LiteralPath $BundleManifest -Destination (Join-Path $package 'dependencies.json') }
 Copy-Item -LiteralPath $ModDll -Destination (Join-Path $package 'CulticVR.dll')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Manage-CulticVR.ps1') -Destination $package
 $script = Join-Path $package 'Manage-CulticVR.ps1'

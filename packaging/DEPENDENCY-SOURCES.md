@@ -1,0 +1,8 @@
+# Bundled component sources
+
+This directory accompanies the binary download; players do not need to extract or build these sources.
+
+- **UUVR 0.4.0**, GPL-3.0-or-later, Raicuparta: https://github.com/Raicuparta/uuvr/tree/de8e9218f8a9310778f2f57c189bef9ccc8c4dc8. The source snapshot includes managed source, build definitions and resources. It omits precompiled vendor/reference assemblies under `lib` and precompiled DLL/EXE/PDB files. Obtain the build references described by the upstream projects from the original upstream repository and your Unity installation. Build the `modern-mono` configuration with the .NET SDK and override `BepInExDir` for the build output. No UUVR code or remaining binaries were modified; packaging omits the unused x86 plugins, Microsoft debug CRT, and legacy Oculus native plugin from this x64/OpenXR release. The complete unfiltered upstream source archive is at https://codeload.github.com/Raicuparta/uuvr/zip/de8e9218f8a9310778f2f57c189bef9ccc8c4dc8.
+- **Unity Doorstop 4.5.0**, LGPL-2.1, NeighTools contributors: https://github.com/NeighTools/UnityDoorstop/tree/33dab9a6733862eb81869ff08431d9478b28784b. The complete unmodified upstream source archive is included. Follow its build instructions to replace the separately distributed `winhttp.dll`; CulticVR does not statically link it.
+
+CulticVR source is supplied in the companion source ZIP and GitHub repository. BepInEx, Harmony/HarmonyX, Mono.Cecil, MonoMod and AssetsTools.NET use permissive licenses; notices and upstream references are supplied in the package's licenses directory and THIRD-PARTY-NOTICES.md. Unity-provided components retain their separate terms and are not relicensed under the project's GPL.

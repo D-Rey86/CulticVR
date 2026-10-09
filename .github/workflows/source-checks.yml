@@ -20,3 +20,13 @@ jobs:
             [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$parseErrors) | Out-Null
             if ($parseErrors) { throw ($parseErrors | Out-String) }
           }
+      - name: Installer argument, Steam discovery and layout checks
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'CulticVR-installer-tests'
+          New-Item -ItemType Directory -Path $dir -Force | Out-Null
+          $exe = Join-Path $dir 'InstallerUiTests.exe'
+          & "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:exe /main:InstallerUiTests /reference:System.Windows.Forms.dll /reference:System.Drawing.dll "/out:$exe" (Join-Path $PWD 'packaging\Installer.cs') (Join-Path $PWD 'packaging\InstallerUiTests.cs')
+          if ($LASTEXITCODE) { throw 'Installer test compilation failed.' }
+          & $exe $dir
+          if ($LASTEXITCODE) { throw 'Installer checks failed.' }
