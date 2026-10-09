@@ -23,6 +23,18 @@ Headset testing has used Quest 3 through Virtual Desktop with an NVIDIA RTX 5070
 
 Start with a clean game installation. The installer refuses conflicting existing mod files. It does not launch the game or change your OpenXR runtime selection. Keep the extracted download for updating or removing the mod. GitHub's automatic source-code ZIP is for developers, not installation.
 
+### Manual installation (if the installer does not work)
+
+Everything you need is in the same download. Use File Explorer for these steps; no commands or additional downloads are required.
+
+1. Close CULTIC and open its game folder through **Steam → CULTIC → Manage → Browse local files**. This is the folder containing `CULTIC.exe`. Start with a clean installation without another BepInEx/UUVR setup.
+2. Open the extracted mod download's **payload** folder. Extract **BepInEx_win_x64_5.4.23.5.zip** into a temporary folder, then copy **all its contents** directly into the game folder. `winhttp.dll` and `doorstop_config.ini` must sit beside `CULTIC.exe`, with a `BepInEx` folder beside them.
+3. Extract **uuvr-mono-modern.zip** from **payload** into another temporary folder. Copy its **patchers** and **plugins** folders into the game's **BepInEx** folder. Merge the folders when prompted. The result must include `BepInEx/plugins/Uuvr.dll` and `BepInEx/patchers/Uuvr.Patcher.dll`; do not create a second nested `BepInEx` folder.
+4. Copy **payload/CulticVR.dll** into the game's **BepInEx/plugins** folder.
+5. Make your headset available with its OpenXR runtime selected, then launch CULTIC through Steam. UUVR copies its required native/runtime files into place on this first launch.
+
+Manual installation does not create the installer's tracking record, so its Update/Uninstall buttons cannot manage that installation. For a mod-only update, close the game and replace `BepInEx/plugins/CulticVR.dll` with the new download's copy; follow any dependency-update instructions in that release. To temporarily disable a manual installation, close the game and rename the game folder's `winhttp.dll` to `winhttp.dll.disabled`. Rename it back to reenable the mod.
+
 ## Updating and removing
 
 Close CULTIC and run **Install CulticVR.exe** again. **Install / Update** installs a newer mod DLL when an existing installation is detected. **Uninstall** removes the recorded mod files while retaining saves and preferences. For an update, use the installer from the new download.
@@ -34,7 +46,8 @@ Older development/manual installations need their original removal procedure bef
 ## Controls and VR Options
 
 - Motion controllers feed CULTIC's gamepad actions. Double-press the left stick click to open the game menu.
-- Aim with the right controller by default. Hold the left palm upward for the wrist quick menu, then point and select with the right trigger. Left Hand Mode moves weapon/offhand ownership and mirrors the artwork.
+- Aim with the right controller by default. Left Hand Mode moves weapon/offhand ownership and mirrors the artwork.
+- **D-pad radial wheel:** the game's D-pad shortcuts are on a radial wheel attached to the **left controller**, with **health and ammo counts** on the wrist display below it. Turn your left palm upward to reveal it, point with the right controller, and press the right trigger to select. These are the default hand assignments; Left Hand Mode moves the wheel/HUD to the opposite offhand.
 - In native options, use the physical left stick to navigate and adjust values. Gameplay retains analog movement.
 - VR Options is in the main and pause menus. **Controller Mode OFF** uses motion controls; **ON** uses a conventional gamepad and head aiming.
 - Left Hand Mode and Swap Movement/Turn Sticks are independent. They do not automatically remap all buttons.
