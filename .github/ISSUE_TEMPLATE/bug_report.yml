@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with the Chapter One VR mod
+description: Report a problem with CULTIC VR
 body:
   - type: input
     id: version

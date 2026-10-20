@@ -48,7 +48,7 @@ foreach ($name in @('README.md','LICENSE','THIRD-PARTY-NOTICES.md','CONTRIBUTING
     $path = Join-Path $repo $name
     if (Test-Path -LiteralPath $path) { Copy-Item -LiteralPath $path -Destination $package }
 }
-if ($Draft) { 'LOCAL PREPARATION ONLY: license and publication review pending.' | Set-Content -LiteralPath (Join-Path $package 'DRAFT-NOT-FOR-PUBLICATION.txt') }
+if ($Draft) { 'LOCAL RELEASE CANDIDATE: publication pending.' | Set-Content -LiteralPath (Join-Path $package 'DRAFT-NOT-FOR-PUBLICATION.txt') }
 $zip = Join-Path $output ('CulticVR-' + $Version + '-windows-x64.zip')
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip
 ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + [IO.Path]::GetFileName($zip)) | Set-Content -LiteralPath (Join-Path $output 'SHA256SUMS.txt')
