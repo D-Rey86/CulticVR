@@ -50,7 +50,8 @@ namespace CulticVR.AimTrial
         private bool UseDisposableAim(scrPlayerControl player)
         {
             if (!_disposableReady || !_ready || player == null || player.tempWeapon == null ||
-                (player.tempWeapon.tWepType != TempWeapon.TWepType.MG && player.tempWeapon.tWepType != TempWeapon.TWepType.LP42) ||
+                (player.tempWeapon.tWepType != TempWeapon.TWepType.MG && player.tempWeapon.tWepType != TempWeapon.TWepType.LP42 &&
+                 player.tempWeapon.tWepType != TempWeapon.TWepType.BBGun) ||
                 player.weaponState != 7 || ZoomState(player) != 0 ||
                 !WorldStereoTrialPlugin.IsActiveGameplayPlayer(player)) return false;
             var game = scrGameControl.Instance;
@@ -62,7 +63,8 @@ namespace CulticVR.AimTrial
         }
 
         private bool UseDisposableHitscanAim(scrPlayerControl player) =>
-            player != null && player.tempWeapon != null && player.tempWeapon.tWepType == TempWeapon.TWepType.MG &&
+            player != null && player.tempWeapon != null &&
+            (player.tempWeapon.tWepType == TempWeapon.TWepType.MG || player.tempWeapon.tWepType == TempWeapon.TWepType.BBGun) &&
             UseDisposableAim(player);
 
         private static Camera AimCameraForDisposable(scrGameControl game)

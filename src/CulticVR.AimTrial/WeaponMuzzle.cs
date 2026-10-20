@@ -62,7 +62,7 @@ namespace CulticVR.AimTrial
             if (!_muzzleReady || !VrSettings.MotionControls || player == null) return false;
             var bank = player.prefabBank;
             // Match actual prefab identity, not names/components/global Instantiate.
-            // No thrown axe, dynamite, Molotov, melee or DLC bank opts in.
+            // No thrown axe, dynamite, Molotov or melee prefab opts in.
             var casing = prefab == bank[7] || prefab == bank[12] || prefab == bank[13] ||
                 prefab == bank[14] || prefab == bank[33];
             if (!casing && prefab != bank[0] && prefab != bank[9] && prefab != bank[26] &&
@@ -75,15 +75,16 @@ namespace CulticVR.AimTrial
                 try
                 {
                     var id = game.gamePlayers[player.playerID].playerLoadout[player.weapon].weaponTableID;
-                    if (id != 1 && id != 2 && id != 3 && id != 4 && id != 5 && id != 9 && id != 10) return false;
+                    if (id != 1 && id != 2 && id != 3 && id != 4 && id != 5 && id != 9 && id != 10 &&
+                        id != 12 && id != 14 && id != 15) return false;
                 }
                 catch { return false; }
             }
             if (!(UseControllerAim(player) || UseBazookaAim(player) || UseDisposableAim(player))) return false;
-            if (IsScopedFg42(player))
+            if (IsScopedWeapon(player))
             {
                 // Preserve the selected-eye optical ray; the physical barrel is
-                // hidden behind this flat scope. Exit at its accepted crosshair.
+                // hidden behind the flat scope. Exit at its mapped crosshair.
                 if (casing) return false;
                 point = _origin;
                 return true;

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems><GameDir>G:/Games/Steam/steamapps/common/CULTIC</GameDir></PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony"><HintPath>$(GameDir)/BepInEx/core/0Harmony.dll</HintPath></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>$(GameDir)/BepInEx/core/Mono.Cecil.dll</HintPath></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(GameDir)/CULTIC_Data/Managed/Assembly-CSharp.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameDir)/CULTIC_Data/Managed/UnityEngine.CoreModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(GameDir)/CULTIC_Data/Managed/UnityEngine.PhysicsModule.dll</HintPath></Reference>
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HelicopterNearMissPatch.cs" Link="HelicopterNearMissPatch.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/ExpandedWorldRumbleHooks.cs" Link="ExpandedWorldRumbleHooks.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/ExpansionEventSelectors.cs" Link="ExpansionEventSelectors.cs" />
+    <Compile Include="ExpansionNativeTests.cs" />
+    <Reference Include="Unity.Netcode.Runtime"><HintPath>$(GameDir)/CULTIC_Data/Managed/Unity.Netcode.Runtime.dll</HintPath></Reference>
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticProducerTags.cs" Link="HapticProducerTags.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticPatterns.cs" Link="HapticPatterns.cs" />
+    <Compile Include="Program.cs" /><Compile Include="WorldRumbleNativeTests.cs" /><Compile Include="../../src/CulticVR.OpenXRControllers/WorldRumbleHooks.cs" Link="WorldRumbleHooks.cs" /><Compile Include="AdditionalProducerTests.cs" /><Compile Include="../../src/CulticVR.OpenXRControllers/AdditionalHapticProducers.cs" Link="AdditionalHapticProducers.cs" /><Compile Include="NativeWorldTests.cs" /><Compile Include="../../src/CulticVR.OpenXRControllers/HapticEventSelectors.cs" Link="HapticEventSelectors.cs" />
+  </ItemGroup>
+</Project>
+

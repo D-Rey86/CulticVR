@@ -27,6 +27,8 @@ static class DisposableTests
         var mgStart = instructions.FindIndex(i => i.labels.Contains(entries[1]));
         var flareStart = instructions.FindIndex(i => i.labels.Contains(entries[2]));
         var bbStart = instructions.FindIndex(i => i.labels.Contains(entries[3]));
+        var exit = (Label)instructions[dispatch + 1].operand;
+        var bbEnd = instructions.FindIndex(i => i.labels.Contains(exit));
         Apply(instructions);
         var changed = new List<int>();
         for (var index = 0; index < instructions.Count; index++)
@@ -35,14 +37,16 @@ static class DisposableTests
             if (instructions[index].opcode == EmitOpCodes.Call && newMethods.Contains(instructions[index].operand))
             {
                 changed.Add(index);
-                Require(index >= mgStart && index < bbStart && before[index].Opcode == EmitOpCodes.Ldfld, "Wrong disposable branch/load");
+                Require(index >= mgStart && index < bbEnd && before[index].Opcode == EmitOpCodes.Ldfld, "Wrong disposable branch/load");
                 var expected = Equals(before[index].Operand, camera) ? cameraProxy : Equals(before[index].Operand, playerCamera) ? playerProxy : parentProxy;
                 Require(Equals(actual.Operand, expected), "Wrong camera adapter");
                 Require(actual.Labels.SequenceEqual(before[index].Labels) && actual.Blocks.SequenceEqual(before[index].Blocks), "Lost instruction metadata");
             }
             else Require(before[index].Same(actual), $"Unrelated Update instruction changed: {index}");
         }
-        Require(changed.Count(index => index < flareStart) == 10 && changed.Count(index => index >= flareStart) == 5, "MG/flare counts");
+        Require(changed.Count(index => index < flareStart) == 10 &&
+            changed.Count(index => index >= flareStart && index < bbStart) == 5 &&
+            changed.Count(index => index >= bbStart) == 5, "MG/flare/BB counts");
 
         var failures = 0;
         void Reject(Action<List<CodeInstruction>> corrupt)
@@ -58,6 +62,9 @@ static class DisposableTests
         Reject(f => f.Insert(changed[^1], new CodeInstruction(EmitOpCodes.Ldfld, camera)));
         Reject(f => f[flareStart].labels.Clear());
         Reject(f => f[bbStart].labels.Clear());
+        Reject(f => f[bbEnd].labels.Clear());
+        Reject(f => f[dispatch + 1].opcode = EmitOpCodes.Nop);
+        Reject(f => f[f.FindIndex(bbStart, bbEnd - bbStart, i => Equals(i.operand, bullet))].opcode = EmitOpCodes.Nop);
         Reject(f => f[dispatch].operand = new int[4]);
         Reject(f => f[dispatch - 2].operand = new object());
         Reject(f => f[f.FindIndex(mgStart, flareStart - mgStart, i => Equals(i.operand, bullet))].opcode = EmitOpCodes.Nop);
@@ -131,14 +138,15 @@ static class DisposableTests
         {
             var fixture = new GateFixture(flags, temporary, state, zoom, connection);
             var (enabled, poseCalls) = GateReplay.Evaluate(aimGate, fixture);
-            var allowed = Enumerable.Range(0, 6).All(fixture.Bit) && (temporary == 1 || temporary == 2) && state == 7 && zoom == 0 && connection == 0;
+            var allowed = Enumerable.Range(0, 6).All(fixture.Bit) && (temporary == 1 || temporary == 2 || temporary == 3) && state == 7 && zoom == 0 && connection == 0;
             Require(enabled == (allowed && fixture.Bit(6)) && poseCalls == (allowed ? 1 : 0), "Disposable gate mismatch");
             var hitscan = GateReplay.Evaluate(bulletGate, fixture);
-            Require(hitscan.Enabled == (allowed && temporary == 1 && fixture.Bit(6)) && hitscan.PoseCalls == (allowed && temporary == 1 ? 1 : 0), "MG-only bullet gate mismatch");
+            var hitscanType = temporary == 1 || temporary == 3;
+            Require(hitscan.Enabled == (allowed && hitscanType && fixture.Bit(6)) && hitscan.PoseCalls == (allowed && hitscanType ? 1 : 0), "MG/BB bullet gate mismatch");
             cases += 2;
         }
-        Console.WriteLine($"PASS: MG10/LP42 five Update loads only; {bulletChanged} accepted castBullet adapters only, native shot/physics untouched. Both bazooka/disposable patch orders identical.");
-        Console.WriteLine($"PASS: {failures} malformed/ordering cases reject without partial mutation; {cases} compiled disposable/MG-only guard fixtures pass (Bazooka/BBGun excluded).");
+        Console.WriteLine($"PASS: MG10/LP42 five/BB five Update loads only; {bulletChanged} accepted castBullet adapters only, native shot/physics untouched. Both bazooka/disposable patch orders identical.");
+        Console.WriteLine($"PASS: {failures} malformed/ordering cases reject without partial mutation; {cases} compiled disposable/MG+BB guard fixtures pass (Bazooka excluded).");
     }
     static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 }

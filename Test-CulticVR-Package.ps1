@@ -50,12 +50,22 @@ try {
                 $call = $instruction.Operand
                 if ($call -isnot [Mono.Cecil.MethodReference]) { continue }
                 if ($call.Name -in @('LogInfo','LogDebug') -or $call.DeclaringType.FullName -in @('System.IO.File','System.IO.Directory')) {
+                    # The cold initializer alone extracts our embedded, hashed helper to BepInEx's cache.
+                    if ($type.FullName -eq 'CulticVR.WorldStereoTrial.RenderingTrials' -and $method.Name -eq 'Initialize' -and
+                        $call.DeclaringType.FullName -in @('System.IO.File','System.IO.Directory') -and
+                        $call.Name -in @('Exists','ReadAllBytes','WriteAllBytes','Delete','Move','CreateDirectory')) { continue }
                     throw "Development tracing or external file dependency in package: $method -> $call"
                 }
             }
         }
     }
-    Write-Host 'Release hygiene: no probe plugins, temporary calibration gestures, verbose tracing, or external file reads/writes.'
+    $native = @($assembly.MainModule.Resources | Where-Object Name -eq 'CulticVR.RenderingNative.dll')
+    if ($native.Count -ne 1) { throw 'Exactly one embedded native rendering helper required.' }
+    $sha=[Security.Cryptography.SHA256]::Create()
+    try { $helperHash=[BitConverter]::ToString($sha.ComputeHash($native[0].GetResourceData())).Replace('-','') } finally {$sha.Dispose()}
+    $helperPath=Join-Path $PSScriptRoot 'src\CulticVR.RenderingNative\bin\CulticVR.RenderingNative.dll'
+    if ($helperHash -ne (Get-FileHash -LiteralPath $helperPath).Hash) { throw 'Embedded native helper differs from compiled source output.' }
+    Write-Host 'Package hygiene: no probes, calibration gestures or verbose tracing; only the owned embedded native helper is extracted at startup.'
     Write-Host "Packaged plugin IDs: $($found -join ', ')"
     Write-Host "CulticVR.dll SHA-256: $((Get-FileHash -LiteralPath $plugin -Algorithm SHA256).Hash)"
 } finally {

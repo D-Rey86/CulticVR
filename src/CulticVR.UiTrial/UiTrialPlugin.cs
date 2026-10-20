@@ -10,7 +10,7 @@ using Uuvr;
 
 namespace CulticVR.UiTrial
 {
-    [BepInPlugin("culticvr.uitrial", "CULTIC VR Selective UI", "0.5.8")]
+    [BepInPlugin("culticvr.uitrial", "CULTIC VR Selective UI", "0.5.14")]
     [BepInDependency("raicuparta.uuvr-modern")]
     [BepInDependency("culticvr.worldstereotrial")]
     public sealed partial class UiTrialPlugin : BaseUnityPlugin
@@ -216,6 +216,7 @@ namespace CulticVR.UiTrial
             var pose = _overlayCamera.transform;
             pose.localPosition = _overlayCameraBaseLocalPosition +
                 WorldStereoTrialPlugin.TrackingPositionCompensation;
+            if(ApplyAutomapPresentation(pose))return;
             var quad = _quad.transform;
             quad.rotation = pose.rotation;
             quad.position = pose.TransformPoint(ModConfiguration.Instance.VrUiPosition.Value);
@@ -258,9 +259,11 @@ namespace CulticVR.UiTrial
                     return CreateNativeMenu(source, intro, settings, quad);
             }
             var candidates = Resources.FindObjectsOfTypeAll<Canvas>()
-                .Where(c => c != null && c.gameObject.scene.IsValid() && c.gameObject.activeInHierarchy &&
+                .Where(c => c != null && c.gameObject.scene.IsValid() &&
                     c.isRootCanvas && c.name != "renderCanvas" && c.name != "scalingCanvas" &&
-                    (c.worldCamera == source || c.transform == source.transform.parent))
+                    ((c.gameObject.activeInHierarchy &&
+                        (c.worldCamera == source || c.transform == source.transform.parent)) ||
+                     IsEpisodeIntroCanvas(c, source.gameObject.scene)))
                 .ToArray();
             if (candidates.Length == 0) return false;
 
@@ -306,6 +309,19 @@ namespace CulticVR.UiTrial
                 ModConfiguration.UiRenderMode.OverlayCamera, TrialScale);
             quad.material.mainTexture = texture;
             return true;
+        }
+
+        private static bool IsEpisodeIntroCanvas(Canvas canvas, Scene scene)
+        {
+            // These shipped intro title cards are separate ScreenSpaceOverlay
+            // roots, not children of UIcamera. E2M1's starts inactive and is
+            // activated by Timeline: capture it at setup without activating it.
+            // Reuse the existing UI target, layer observers and restoration.
+            if (canvas.gameObject.scene != scene ||
+                (scene.name != "sceneE2M0" && scene.name != "sceneE2M1") ||
+                canvas.renderMode != RenderMode.ScreenSpaceOverlay || canvas.name != "Canvas") return false;
+            var parent = canvas.transform.parent;
+            return parent != null && parent.name == "introCutscene";
         }
 
         private bool CreateNativeMenu(Camera source, scrIntroController intro, ModConfiguration settings, Renderer quad)
@@ -413,6 +429,7 @@ namespace CulticVR.UiTrial
             // Restore before settings changes can replace the overlay, and even
             // when the source camera was destroyed during a scene transition.
             RestoreMenuBackground();
+            RestoreAutomapPresentation();
             // Observers have no Update and remain inert until this hierarchy is
             // captured again. Reuse them if Restore/Create happen in one frame;
             // Destroy would leave a pending-deletion component on that path.

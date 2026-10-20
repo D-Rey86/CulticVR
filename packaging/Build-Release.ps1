@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$GameDir,
-    [string]$Version = '1.0.0',
+    [string]$Version = '1.1.0',
     [string]$DependencyDir = (Join-Path (Split-Path -Parent $PSScriptRoot) 'tools'),
     [switch]$Draft
 )
@@ -21,7 +21,7 @@ foreach ($folder in @('src','tests','packaging','.github')) {
     foreach ($file in Get-ChildItem -LiteralPath $base -File -Recurse) {
         $relative = $file.FullName.Substring($repo.Length + 1)
         if ($relative -match '(^|[\\/])(bin|obj)([\\/]|$)') { continue }
-        if ($file.Extension -notin @('.cs','.csproj','.ps1','.json','.md','.yml','.yaml','.props','.txt')) { throw "Unreviewed source export type: $relative" }
+        if ($file.Extension -notin @('.cs','.csproj','.ps1','.json','.md','.yml','.yaml','.props','.txt','.c','.cpp','.h')) { throw "Unreviewed source export type: $relative" }
         $dest = Join-Path $sourceRoot $relative
         New-Item -ItemType Directory -Path (Split-Path -Parent $dest) -Force | Out-Null
         Copy-Item -LiteralPath $file.FullName -Destination $dest
@@ -32,6 +32,7 @@ foreach ($name in @('README.md','LICENSE','THIRD-PARTY-NOTICES.md','CONTRIBUTING
     if (Test-Path -LiteralPath $path) { Copy-Item -LiteralPath $path -Destination $sourceRoot }
 }
 # Build the exported source, proving it does not require the private development tree.
+& (Join-Path $sourceRoot 'src\CulticVR.RenderingNative\Build.ps1')
 dotnet build (Join-Path $sourceRoot 'src\CulticVR\CulticVR.csproj') -c Release "-p:GameDir=$GameDir" --nologo
 if ($LASTEXITCODE -ne 0) { throw 'Exported-source build failed.' }
 & (Join-Path $sourceRoot 'Test-CulticVR-Package.ps1') -GameDir $GameDir

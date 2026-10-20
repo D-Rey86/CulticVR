@@ -13,7 +13,7 @@ using UnityEngine.XR;
 
 namespace CulticVR.AimPreview
 {
-    [BepInPlugin("culticvr.aimpreview", "CULTIC VR Controller Viewmodel", "0.8.13")]
+    [BepInPlugin("culticvr.aimpreview", "CULTIC VR Controller Viewmodel", "0.8.15")]
     [BepInDependency("culticvr.worldstereotrial")]
     [BepInDependency("culticvr.openxrcontrollers")]
     public sealed partial class AimPreviewPlugin : BaseUnityPlugin
@@ -206,7 +206,7 @@ namespace CulticVR.AimPreview
                 if (_handObject != null) DestroyHand();
                 return;
             }
-            if (!VrHandPose.TryHead(out var headPosition,out _))
+            if (!VrHandPose.TryHead(out var headPosition,out var headRotation))
             {
                 HideWristQuickMenu();
                 DestroyWristStatusHud();
@@ -260,7 +260,7 @@ namespace CulticVR.AimPreview
                     shieldEquipped ? _shieldPositionOffset : _leftPositionOffset,
                     shieldEquipped ? _shieldRotationOffset : _leftRotationOffset);
             }
-            UpdateWristQuickMenu(player!, trackedEyePosition, yaw, headPosition,
+            UpdateWristQuickMenu(player!, trackedEyePosition, yaw, headPosition,headRotation,
                 leftTracked, leftGripPosition, leftGripRotation, origin, orientation, rightDevice);
             UpdateWristStatusHud(player!, trackedEyePosition, yaw, headPosition,
                 leftTracked, leftGripPosition, leftGripRotation);
@@ -371,6 +371,7 @@ namespace CulticVR.AimPreview
             {
                 instance._scopeSprite = sprite;
                 instance._scopeCrosshairKnown = ScopeSightingMath.TryGetFg42Crosshair(
+                    sprite.name, out instance._scopeCrosshairPixel) || ScopeSightingMath.TryGetRifleCrosshair(
                     sprite.name, out instance._scopeCrosshairPixel);
             }
             if (!instance._scopeCrosshairKnown) return false;
@@ -1057,3 +1058,4 @@ namespace CulticVR.AimPreview
         }
     }
 }
+

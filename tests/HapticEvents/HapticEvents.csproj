@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+  <ItemGroup>
+    <!-- Unity's Mono execution does not use .NET Core tiered-PGO/OSR bookkeeping. -->
+    <RuntimeHostConfigurationOption Include="System.Runtime.TieredCompilation" Value="false" />
+    <Reference Include="0Harmony"><HintPath>G:/Games/Steam/steamapps/common/CULTIC/BepInEx/core/0Harmony.dll</HintPath></Reference>
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticEvents.cs" Link="HapticEvents.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/TemporaryHapticPatch.cs" Link="TemporaryHapticPatch.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticHeartbeat.cs" Link="HapticHeartbeat.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticPatterns.cs" Link="HapticPatterns.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/ExpandedWorldRumbleHooks.cs" Link="ExpandedWorldRumbleHooks.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/ExpansionEventSelectors.cs" Link="ExpansionEventSelectors.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticExpansion.cs" Link="HapticExpansion.cs" />
+    <Compile Include="ExpansionTests.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HelicopterNearMiss.cs" Link="HelicopterNearMiss.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HelicopterNearMissPatch.cs" Link="HelicopterNearMissPatch.cs" />
+    <Compile Include="HelicopterNearMissTests.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticExtras.cs" Link="HapticExtras.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticEventSelectors.cs" Link="HapticEventSelectors.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/ExplosionHapticCapture.cs" Link="ExplosionHapticCapture.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/HapticWorldRumble.cs" Link="HapticWorldRumble.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/WorldRumbleHooks.cs" Link="WorldRumbleHooks.cs" />
+    <Compile Include="EventFixture.cs" /><Compile Include="Program.cs" /><Compile Include="WorldCaptureTests.cs" /><Compile Include="WorldRumbleTests.cs" /><Compile Include="CinematicImpactTests.cs" /><Compile Include="GameplayGateTests.cs" />
+  </ItemGroup>
+</Project>
+
+

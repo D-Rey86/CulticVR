@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="../../src/CulticVR.AimTrial/BazookaFiringPatch.cs" Link="BazookaFiringPatch.cs" />
     <Compile Include="../../src/CulticVR.AimTrial/DisposableFiringPatch.cs" Link="DisposableFiringPatch.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/TemporaryHapticPatch.cs" Link="TemporaryHapticPatch.cs" />
     <Reference Include="0Harmony"><HintPath>$(GameDir)/BepInEx/core/0Harmony.dll</HintPath></Reference>
     <Reference Include="Mono.Cecil"><HintPath>$(GameDir)/BepInEx/core/Mono.Cecil.dll</HintPath></Reference>
   </ItemGroup>

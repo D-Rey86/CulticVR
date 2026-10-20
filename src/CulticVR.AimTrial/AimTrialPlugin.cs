@@ -65,7 +65,7 @@ namespace CulticVR.AimTrial
         {
             Instance = this;
             _scopeSightingEye = Config.Bind("Scope", "SightingEye", ScopeEye.Right,
-                "Eye used to sight through the FG42 scope: Right or Left. Independent of the weapon hand. Unscoped aim is unchanged.");
+                "Eye used to sight through the FG42 or bolt-action scope: Right or Left. Independent of the weapon hand. Unscoped aim is unchanged.");
             _renderScopeEyeProvider = () => ScopeSightingEye == ScopeEye.Left ?
                 Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right;
             WorldStereoTrialPlugin.ScopeSightingEyeProvider = _renderScopeEyeProvider;
@@ -178,9 +178,7 @@ namespace CulticVR.AimTrial
                 // same camera substitution drives its spawn and velocity, while
                 // the live reticle shows the initial throw direction. The charge
                 // still determines speed and gravity determines the landing point.
-                // Unarmed IDs 7 and 13 use the same charged-melee fireEvent
-                // path as the hatchet. Their idle viewmodel is intentionally
-                // blank; the fists appear only during the punch animation.
+                // ID7 is unarmed; ID13 is the native baton/Night Stick path.
                 // Shotgun ID 3 is hitscan in both fire modes. Its alternate
                 // fire also uses playerCamera for knockback; that movement read
                 // is deliberately kept on the native camera below.
@@ -199,8 +197,11 @@ namespace CulticVR.AimTrial
                 // charged particles/impact projectiles in altFireEvent. Both use
                 // mainCam for spawn position and launch direction; enable the
                 // same proxy in BOTH gates, preserving native spread and physics.
+                // Chapter Two: revolver11, SASG12, bolt-action14, Thompson15,
+                // pitchfork16. Native damage/spread/charge remain game-owned.
                 if (weaponId != 0 && weaponId != 1 && weaponId != 2 && weaponId != 3 && weaponId != 4 && weaponId != 5 && weaponId != 6 &&
-                    weaponId != 7 && weaponId != 8 && weaponId != 9 && weaponId != 10 && weaponId != 13) return false;
+                    weaponId != 7 && weaponId != 8 && weaponId != 9 && weaponId != 10 && weaponId != 11 && weaponId != 12 &&
+                    weaponId != 13 && weaponId != 14 && weaponId != 15 && weaponId != 16) return false;
             }
             catch { return false; }
             return UpdatePose(player);
@@ -254,8 +255,8 @@ namespace CulticVR.AimTrial
             _rawMuzzleOrigin = _origin;
             _rawMuzzleRotation = _rotation;
             // A flat scope's normal is NOT the eye's sight line through its
-            // crosshair. Change only ID9/LT, keeping the raw pointer elsewhere.
-            if (IsScopedFg42(player))
+            // crosshair. Both native scoped rifles use measured sprite anchors.
+            if (IsScopedWeapon(player))
             {
                 var stereoEye = eye == ScopeEye.Left ? Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right;
                 if (WorldStereoTrialPlugin.TryGetSightingEyeOffset(player, stereoEye, out var eyeOffset) &&
@@ -280,14 +281,15 @@ namespace CulticVR.AimTrial
             return true;
         }
 
-        private static bool IsScopedFg42(scrPlayerControl player)
+        private static bool IsScopedWeapon(scrPlayerControl player)
         {
             if (ZoomState(player) != 1) return false;
             var game = scrGameControl.Instance;
             if (game == null || player.weapon < 0) return false;
             try
             {
-                return game.gamePlayers[player.playerID].playerLoadout[player.weapon].weaponTableID == 9;
+                var id = game.gamePlayers[player.playerID].playerLoadout[player.weapon].weaponTableID;
+                return id == 9 || id == 14;
             }
             catch { return false; }
         }
@@ -298,7 +300,7 @@ namespace CulticVR.AimTrial
             // Interaction can populate the proxy in Update before Animator sets
             // the firing sprite. Refresh once at the event, then share the pose
             // across all original bullet/tracer/casing reads in that shot.
-            if (trial != null && IsScopedFg42(__instance)) trial._poseFrame = -1;
+            if (trial != null && IsScopedWeapon(__instance)) trial._poseFrame = -1;
         }
 
         private bool EnsurePointerControls()
@@ -549,7 +551,7 @@ namespace CulticVR.AimTrial
             try
             {
                 var weaponId = game.gamePlayers[player.playerID].playerLoadout[player.weapon].weaponTableID;
-                return ((weaponId == 1 || weaponId == 2 || weaponId == 3 || weaponId == 10) && UseControllerAim(player)) ||
+                return ((weaponId == 1 || weaponId == 2 || weaponId == 3 || weaponId == 10 || weaponId == 11) && UseControllerAim(player)) ||
                     ((weaponId == 0 || weaponId == 16) && UseThrownWeaponAim(player));
             }
             catch { return false; }
@@ -638,6 +640,13 @@ namespace CulticVR.AimTrial
             var playerCount = 0;
             var parentCount = 0;
             var assistCount = 0;
+            // The sole primary-fire knockSpeed assignment is SASG's upgrade.
+            // Keep its movement camera native while redirecting shot/casing reads.
+            var movementRead = original.Name == "fireEvent" ? FindPrimaryKnockbackRead(instructions,
+                AccessTools.Field(typeof(scrPlayerControl), "knockSpeed"), AccessTools.Field(typeof(scrPlayerControl), "playerCamera"),
+                AccessTools.PropertyGetter(typeof(GameObject), "transform"), AccessTools.PropertyGetter(typeof(Transform), "forward"),
+                AccessTools.Method(typeof(Vector3), "op_Multiply", new[] { typeof(Vector3), typeof(float) }),
+                AccessTools.Method(typeof(Vector3), "op_Addition", new[] { typeof(Vector3), typeof(Vector3) })) : null;
             foreach (var instruction in instructions)
             {
                 if (instruction.opcode != OpCodes.Ldfld || instruction.operand is not FieldInfo field) continue;
@@ -651,6 +660,7 @@ namespace CulticVR.AimTrial
                 else if (field.DeclaringType == typeof(scrPlayerControl) && field.Name == "playerCamera")
                 {
                     playerCount++;
+                    if (ReferenceEquals(instruction, movementRead)) continue;
                     replacement = AccessTools.Method(typeof(AimTrialPlugin),
                         original.Name == "altFireEvent" ? nameof(AimPlayerCameraForAlt) : nameof(AimPlayerCamera));
                 }
@@ -674,6 +684,29 @@ namespace CulticVR.AimTrial
                 throw new InvalidOperationException($"{original.Name} camera read count changed: " +
                     $"main={cameraCount}, player={playerCount}, parent={parentCount}, assist={assistCount}");
             return instructions;
+        }
+
+        private static CodeInstruction FindPrimaryKnockbackRead(List<CodeInstruction> instructions,
+            FieldInfo knock, FieldInfo camera, MethodInfo transform, MethodInfo forward, MethodInfo multiply, MethodInfo add)
+        {
+            if (knock == null || camera == null || transform == null || forward == null || multiply == null || add == null)
+                throw new MissingMemberException("Primary-fire movement metadata unavailable");
+            CodeInstruction? found = null;
+            for (var i = 10; i < instructions.Count; i++)
+            {
+                if (instructions[i].opcode != OpCodes.Stfld || !Equals(instructions[i].operand, knock)) continue;
+                if (found != null || instructions[i - 10].opcode != OpCodes.Ldarg_0 ||
+                    instructions[i - 9].opcode != OpCodes.Ldarg_0 ||
+                    instructions[i - 8].opcode != OpCodes.Ldfld || !Equals(instructions[i - 8].operand, knock) ||
+                    instructions[i - 7].opcode != OpCodes.Ldarg_0 ||
+                    instructions[i - 6].opcode != OpCodes.Ldfld || !Equals(instructions[i - 6].operand, camera) ||
+                    !instructions[i - 5].Calls(transform) || !instructions[i - 4].Calls(forward) ||
+                    instructions[i - 3].opcode != OpCodes.Ldc_R4 || !Equals(instructions[i - 3].operand, -3f) ||
+                    !instructions[i - 2].Calls(multiply) || !instructions[i - 1].Calls(add))
+                    throw new InvalidOperationException("Primary-fire knockback contract changed");
+                found = instructions[i - 6];
+            }
+            return found ?? throw new InvalidOperationException("Primary-fire knockback unavailable");
         }
     }
 }

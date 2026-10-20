@@ -93,6 +93,7 @@ foreach (var name in new[] { "fireEvent", "altFireEvent", "Update", "spawnShells
     total += spawns;
 }
 Console.WriteLine($"PASS {total} shipping spawn call sites; static only, not Unity/headset validation.");
+ChapterTwoMuzzles.Verify(managed);
 static void Require(bool condition, string message) { if (!condition) throw new Exception(message); }
 static class Proxy
 {

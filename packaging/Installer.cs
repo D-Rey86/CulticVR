@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 
 [assembly: System.Reflection.AssemblyTitle("CULTIC VR Installer")]
-[assembly: System.Reflection.AssemblyVersion("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.1.0.0")]
 [assembly: System.Reflection.AssemblyCopyright("Copyright (C) 2026 D-Rey86 and contributors")]
 
 internal static class Installer
@@ -133,7 +133,7 @@ internal sealed class InstallWindow : Form
 
     internal InstallWindow()
     {
-        Text = "CULTIC VR — Chapter One";
+        Text = "CULTIC VR";
         Font = new Font("Segoe UI", 10);
         ClientSize = new Size(680, 360);
         MinimumSize = new Size(580, 350);
@@ -145,7 +145,7 @@ internal sealed class InstallWindow : Form
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        layout.Controls.Add(new Label { Text = "CULTIC VR 1.0.0", Font = new Font(Font.FontFamily, 18, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 0, 0, 12) });
+        layout.Controls.Add(new Label { Text = "CULTIC VR 1.1.0", Font = new Font(Font.FontFamily, 18, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 0, 0, 12) });
         layout.Controls.Add(new Label { Text = "Close CULTIC, select its game folder, then click Install / Update.", AutoSize = true, Margin = new Padding(0, 0, 0, 8) });
         var folder = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 2, Margin = new Padding(0, 0, 0, 12) };
         folder.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));

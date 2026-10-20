@@ -54,6 +54,25 @@ namespace CulticVR.WorldStereoTrial
             return true;
         }
 
+        // Original 480x220 Lee-Enfield pixels: the thin horizontal crossbar
+        // and center post are offset from the image center. Officer recoil
+        // frames differ by 1-4 pixels; do not alias them to the standard skin.
+        public static bool TryGetRifleCrosshair(string spriteName, out Vector2 pixel)
+        {
+            switch (spriteName)
+            {
+                case "sprWeaponLeeEnfield_39":
+                case "sprWeaponLeeEnfieldOfficer_39": pixel = new Vector2(199.5f, 110.5f); return true;
+                case "sprWeaponLeeEnfield_40": pixel = new Vector2(200.5f, 83.5f); return true;
+                case "sprWeaponLeeEnfield_41": pixel = new Vector2(199.5f, 97.5f); return true;
+                case "sprWeaponLeeEnfield_42": pixel = new Vector2(199.5f, 112.5f); return true;
+                case "sprWeaponLeeEnfieldOfficer_40": pixel = new Vector2(200.5f, 82.5f); return true;
+                case "sprWeaponLeeEnfieldOfficer_41": pixel = new Vector2(200.5f, 93.5f); return true;
+                case "sprWeaponLeeEnfieldOfficer_42": pixel = new Vector2(199.5f, 111.5f); return true;
+                default: pixel = Vector2.zero; return false;
+            }
+        }
+
         public static bool Finite(Vector3 value) => Finite(value.x) && Finite(value.y) && Finite(value.z);
         private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
     }

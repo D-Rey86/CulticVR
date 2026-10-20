@@ -60,6 +60,17 @@ foreach (var pair in new[] { ("32", 110.5f), ("33", 97.5f), ("34", 95.5f), ("35"
     Require(point.x == 240f && point.y == pair.Item2, "measured original-sprite anchor");
 }
 Require(!ScopeSightingMath.TryGetFg42Crosshair("sprWeaponFG42_31", out _), "transition artwork not guessed");
+foreach (var anchor in new[] {
+    ("sprWeaponLeeEnfield_39",199.5f,110.5f), ("sprWeaponLeeEnfield_40",200.5f,83.5f),
+    ("sprWeaponLeeEnfield_41",199.5f,97.5f), ("sprWeaponLeeEnfield_42",199.5f,112.5f),
+    ("sprWeaponLeeEnfieldOfficer_39",199.5f,110.5f), ("sprWeaponLeeEnfieldOfficer_40",200.5f,82.5f),
+    ("sprWeaponLeeEnfieldOfficer_41",200.5f,93.5f), ("sprWeaponLeeEnfieldOfficer_42",199.5f,111.5f) })
+{
+    Require(ScopeSightingMath.TryGetRifleCrosshair(anchor.Item1,out var point) && point.x==anchor.Item2 && point.y==anchor.Item3,
+        "measured rifle crossbar/post intersection");
+}
+Require(!ScopeSightingMath.TryGetRifleCrosshair("sprWeaponLeeEnfield_38",out _),"rifle transition not guessed");
+Require(!ScopeSightingMath.TryGetRifleCrosshair("sprWeaponLeeEnfield_43",out _),"rifle bolt-cycle frame not guessed");
 Require(!ScopeSightingMath.TryGetDirection(Vector3.zero, Vector3.zero, out _), "coincident eye/reticle rejected");
 Require(!ScopeSightingMath.TryGetDirection(new Vector3(float.NaN, 0, 0), Vector3.one, out _), "bad pose rejected");
 var invalid = new Matrix4x4();

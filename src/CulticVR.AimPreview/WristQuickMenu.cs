@@ -70,7 +70,7 @@ namespace CulticVR.AimPreview
         }
 
         private void UpdateWristQuickMenu(scrPlayerControl player, Vector3 eyePosition,
-            Quaternion bodyYaw, Vector3 headTrackingPosition, bool leftTracked,
+            Quaternion bodyYaw, Vector3 headTrackingPosition, Quaternion headTrackingRotation,bool leftTracked,
             Vector3 leftTrackingPosition, Quaternion leftTrackingRotation,
             Vector3 rightPointerOrigin, Quaternion rightPointerRotation,
             UnityEngine.XR.InputDevice rightDevice)
@@ -85,15 +85,24 @@ namespace CulticVR.AimPreview
                 return;
             }
 
-            var leftOrigin = eyePosition + bodyYaw * (leftTrackingPosition - headTrackingPosition);
-            var leftOrientation = bodyYaw * leftTrackingRotation;
-            var palmNormal = leftOrientation * (VrSettings.LeftWeapon?Vector3.left:Vector3.right);
-
+            // Create the hidden wrist host as soon as this HUD is available.
+            // Status-strip attachment must not wait for the first palm glance
+            // after loading/replacing the native player HUD.
             if (_wristMenuRoot == null || _wristMenuHud != hud)
             {
                 DestroyWristQuickMenu();
                 if (!CreateWristQuickMenu(hud)) return;
             }
+
+            var leftOrigin = eyePosition + bodyYaw * (leftTrackingPosition - headTrackingPosition);
+            var leftOrientation = bodyYaw * leftTrackingRotation;
+            var palmNormal = leftOrientation * (VrSettings.LeftWeapon?Vector3.left:Vector3.right);
+            var wristPosition=PalmAttention.WristCenter(!VrSettings.LeftWeapon,leftOrigin,leftOrientation);
+            if(!PalmAttention.LookingAt(eyePosition,bodyYaw*headTrackingRotation,wristPosition,_wristMenuVisible)) {
+                // Gaze loss hides and releases capture immediately, independent of palm debounce.
+                HideWristQuickMenu();return;
+            }
+
             SyncWristQuickMenuIcons(hud);
 
             var palmDot = Vector3.Dot(palmNormal, Vector3.up);
@@ -117,7 +126,6 @@ namespace CulticVR.AimPreview
                 return;
             }
 
-            var wristPosition = leftOrigin - leftOrientation * Vector3.forward * 0.115f + palmNormal * 0.035f;
             var toWrist = wristPosition - eyePosition;
             if (toWrist.sqrMagnitude < 0.01f)
             {

@@ -11,12 +11,14 @@ using UnityEngine.XR.OpenXR.Features;
 
 namespace CulticVR.OpenXRControllers
 {
-    [BepInPlugin("culticvr.openxrcontrollers", "CULTIC VR OpenXR Controller Bootstrap", "0.1.8")]
+    [BepInPlugin("culticvr.openxrcontrollers", "CULTIC VR OpenXR Controller Bootstrap", "0.1.26")]
     [BepInDependency("raicuparta.uuvr-modern")]
     public sealed partial class OpenXRControllersPlugin : BaseUnityPlugin
     {
         private void Awake()
         {
+            AutomapInput.Initialize();
+            InitializeHaptics();
             // UUVR creates its loader in Start. Register before that, while feature
             // configuration can still be changed safely.
             var settings = OpenXRSettings.Instance;
@@ -47,10 +49,11 @@ namespace CulticVR.OpenXRControllers
 
         protected override void OnSessionBegin(ulong xrSession)
         {
-            if (_attached) return;
+            if (_attached) { OpenXRControllersPlugin.HapticSessionBegin(xrSession); return; }
             try
             {
                 _attached = RegisterActions();
+                if (_attached) OpenXRControllersPlugin.HapticSessionBegin(xrSession);
                 Debug.Log($"CULTIC VR controller action sets attached={_attached} session={xrSession:X}");
             }
             catch (Exception exception)
@@ -59,7 +62,9 @@ namespace CulticVR.OpenXRControllers
             }
         }
 
-        protected override void OnSessionDestroy(ulong xrSession) => _attached = false;
+        protected override void OnSessionDestroy(ulong xrSession) { OpenXRControllersPlugin.HapticSessionEnd();_attached = false; }
+        protected override void OnSessionEnd(ulong xrSession) => OpenXRControllersPlugin.HapticSessionEnd();
+        protected override void OnSessionStateChange(int oldState,int newState) => OpenXRControllersPlugin.HapticSessionState(newState);
 
         private static bool RegisterActions()
         {
@@ -95,7 +100,14 @@ namespace CulticVR.OpenXRControllers
                         bindings.Add(new SerializedBinding { actionId = id, path = hand + action.Path });
                 }
 
-                if (!SuggestBindings(profile.Path, bindings.ToArray(), (uint)bindings.Count))
+                int inputBindingCount=bindings.Count;
+                var haptic=CreateAction(actionSet,"haptic","Haptic Output",4,default,new[]{Left,Right},2,new[]{"Haptic"},1);
+                if(haptic!=0){
+                    bindings.Add(new SerializedBinding{actionId=haptic,path=Left+"/output/haptic"});
+                    bindings.Add(new SerializedBinding{actionId=haptic,path=Right+"/output/haptic"});
+                }
+                if (!SuggestBindings(profile.Path, bindings.ToArray(), (uint)bindings.Count) &&
+                    !(bindings.Count>inputBindingCount&&SuggestBindings(profile.Path,bindings.GetRange(0,inputBindingCount).ToArray(),(uint)inputBindingCount)))
                     Debug.LogWarning($"CULTIC VR: OpenXR did not accept suggested bindings for {profile.Path}.");
             }
 
@@ -235,3 +247,10 @@ namespace CulticVR.OpenXRControllers
         private static extern bool AttachActionSets();
     }
 }
+
+
+
+
+
+
+

@@ -29,6 +29,7 @@ static class GateReplay
                 case Code.Ldc_I4_0: stack.Push(0); break;
                 case Code.Ldc_I4_1: stack.Push(1); break;
                 case Code.Ldc_I4_2: stack.Push(2); break;
+                case Code.Ldc_I4_3: stack.Push(3); break;
                 case Code.Ldc_I4_7: stack.Push(7); break;
                 case Code.Ldfld:
                     var receiver = stack.Pop();

@@ -49,6 +49,9 @@ namespace CulticVR.UiTrial
         private Sprite? _radioSelectedSprite;
         private Material? _headerMaterial;
         private float _shownResolution = -1f;
+        private TextMeshProUGUI _shaderStatusText = null!;
+        private uint _shaderReady=uint.MaxValue;
+        private float _shaderStatusAt;
 
         internal void Build(scrMenuControllerV2 menu)
         {
@@ -75,7 +78,13 @@ namespace CulticVR.UiTrial
             Slider("Brightness",()=>scrGameControl.Instance.prefsList["gamma"],v=> {
                 scrGameControl.Instance.updatePref("gamma",v); _menu.prefsChanged=true;
             },0f,1f,.025f,.5f,"0%","Uses CULTIC's brightness value. 50% is neutral; other values enable native colour grading on the stereo world and add GPU work.");
+            Header("Rendering");
+            Toggle("Deferred Rendering",()=>VrSettings.DeferredTrial.Value,v=>VrSettings.Set(VrSettings.DeferredTrial,v),false,
+                "Switch the stereo world camera live. May improve performance in areas with many lights, but can remove fog and change transparency, scopes or lighting. Disabled restores the original camera path.");
+            _shaderStatusText=Header("Shaders: waiting for gameplay").controlMainText;
             Header("Controls");
+            Toggle("Look-at-palm Map",()=>VrSettings.PalmMap.Value,v=>VrSettings.Set(VrSettings.PalmMap,v),true,
+                "Look at your weapon-hand palm (right by default) to open/close the map; look away before repeating. No raising or steady-hand gesture. Map: left stick pan, right stick rotate, triggers zoom, grips height, X recenter, Y mask, A marker, B close.");
             Toggle("Teleport",()=>VrSettings.Teleport.Value,v=>VrSettings.Set(VrSettings.Teleport,v),false,
                 "Hold the movement stick forward to aim; release to teleport. Green is a valid destination. Native collision, ceiling clearance and a clear travel path are required.");
             Toggle("Snap Turn",()=>VrSettings.SnapTurn.Value,v=>VrSettings.Set(VrSettings.SnapTurn,v),false,
@@ -87,6 +96,13 @@ namespace CulticVR.UiTrial
                 "Weapon and aiming hand on the left; off-hand item and wrist display on the right. Button assignments are unchanged.");
             Toggle("Swap Movement/Turn Sticks",()=>VrSettings.SticksSwapped,v=>VrSettings.Set(VrSettings.SwapSticks,v),false,
                 "Swap only movement and turning axes. Applies to motion controllers; regular gamepad keeps the game's bindings.");
+            Header("Haptics");
+            Toggle("Motion Controller Haptics",()=>VrSettings.ControllerHaptics.Value,v=>VrSettings.Set(VrSettings.ControllerHaptics,v),true,
+                "Custom firearm recoil in your weapon hand; actual health/armor damage in both hands. Does not change regular gamepad feedback.");
+            Slider("Controller Strength",()=>VrSettings.ControllerHapticStrength.Value,v=>VrSettings.Set(VrSettings.ControllerHapticStrength,v),0f,1f,.05f,.6f,"0%","Independent motion-controller vibration strength.");
+            Toggle("bHaptics TactSuit",()=>VrSettings.VestHaptics.Value,v=>VrSettings.Set(VrSettings.VestHaptics,v),false,
+                "X40 trial: gun-specific incoming patterns, directional melee, explosions on both panels and a fast chest heartbeat at 25 health or less. Front/back uses VR view yaw, not tracked torso rotation. Have Player and vest connected before enabling.");
+            Slider("Vest Strength",()=>VrSettings.VestHapticStrength.Value,v=>VrSettings.Set(VrSettings.VestHapticStrength,v),0f,1f,.05f,.4f,"0%","Independent bHaptics vibration strength. Disabled or disconnected vest does not affect controller haptics.");
             Header("Weapons");
             var axisNames=new[]{"Position X","Position Y","Position Z","Rotation X","Rotation Y","Rotation Z"};
             for(int i=0;i<6;i++) {
@@ -195,6 +211,13 @@ namespace CulticVR.UiTrial
             row.rectTransform.sizeDelta=new Vector2(504,20);
             row.Action=action; row.Help(help); _rows.Add(row);
         }
+        private void Choice(string label,Func<int> get,Action<int> set,string[] labels,string help)
+        {
+            var row=Clone(_buttonTemplate.gameObject,_vr.menuGroup.transform,label);
+            row.GetValue=()=>get();row.SetValue=v=>set((int)v);row.Min=0;row.Max=labels.Length-1;row.Step=1;
+            row.ValueLabels=labels;row.ChoiceLabel=label;
+            row.Help(help+" Use left/right, or confirm to cycle.");row.Refresh();_rows.Add(row);
+        }
         private void Radio()
         {
             var row=Clone(_toggleTemplate.gameObject,_vr.menuGroup.transform,"Snap Turn Amount");
@@ -232,6 +255,15 @@ namespace CulticVR.UiTrial
             if(_wasOpen && !open) Save(); _wasOpen=open;
             if((VrSettings.Dirty||_calibrationDirty) && Time.unscaledTime>=_saveAt) Save();
             if(!open) return;
+            if(Time.unscaledTime>=_shaderStatusAt) {
+                _shaderStatusAt=Time.unscaledTime+1f;
+                uint ready=WorldStereoTrialPlugin.RenderingShaderReady;
+                if(ready!=_shaderReady) {
+                    _shaderReady=ready;
+                    _shaderStatusText.text=ready==0?WorldStereoTrialPlugin.RenderingStartupStatus+" (waiting for gameplay)":
+                        "Shaders: lighting "+((ready&3)==3?"ready":"unavailable")+", palette "+((ready&4)!=0?"ready":"unavailable");
+                }
+            }
             int w=Mathf.RoundToInt(UnityEngine.XR.XRSettings.eyeTextureWidth*UnityEngine.XR.XRSettings.renderViewportScale),
                 h=Mathf.RoundToInt(UnityEngine.XR.XRSettings.eyeTextureHeight*UnityEngine.XR.XRSettings.renderViewportScale);
             float requested=VrSettings.Resolution.Value;
@@ -252,6 +284,8 @@ namespace CulticVR.UiTrial
         internal Action? Action,Changed;
         internal float Min,Max,Step,Default;
         internal string Format="0";
+        internal string[]? ValueLabels;
+        internal string ChoiceLabel="";
         internal RectTransform? SliderBounds,SliderBar;
         internal Image? SliderImage,ToggleImage;
         internal Sprite[]? ToggleSprites;
@@ -290,7 +324,9 @@ namespace CulticVR.UiTrial
         internal void Refresh()
         {
             if(GetToggle!=null && ToggleImage!=null) ToggleImage.overrideSprite=ToggleSprites![GetToggle()?1:0];
-            if(GetValue!=null && RadioValues!=null) {
+            if(GetValue!=null && ValueLabels!=null) {
+                controlMainText.text=ChoiceLabel+": "+ValueLabels[Mathf.Clamp((int)GetValue(),0,ValueLabels.Length-1)];
+            } else if(GetValue!=null && RadioValues!=null) {
                 for(int i=0;i<RadioValues.Length;i++) {
                     bool selected=RadioValues[i]==(int)GetValue();
                     RadioImages![i].sprite=selected?RadioFilled:RadioEmpty;
@@ -305,6 +341,7 @@ namespace CulticVR.UiTrial
         public override void Press()
         {
             if(GetToggle!=null) { SetToggle!(!GetToggle()); Refresh(); Changed?.Invoke(); }
+            else if(ValueLabels!=null) { SetValue!(((int)GetValue!()+1)%ValueLabels.Length);Refresh();Changed?.Invoke(); }
             else Action?.Invoke();
             systemMenu.playSound(pressAudio);
         }

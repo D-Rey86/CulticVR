@@ -150,6 +150,58 @@ namespace CulticVR.AimPreview
             Add("sprLP42V2", 378, 156, -1, -1, 3);
             Add("sprLP42V2", 334, 111, -1, -1, 4);
             Add("sprLP42V2", 318, 59, -1, -1, 5, 6);
+            // Chapter Two muzzle-only annotations, reviewed in original 480x220 art.
+            // Use the live firing sprite, never the lingering flash on recoil frames.
+            // Officer sprites are reviewed separately; SASG OH idle is 43 vs 42.
+            // No casing offsets are inferred. Scoped rifles use the eye-ray owner.
+            Add("sprWeaponLeeEnfield", 222, 116, -1, -1, 0);
+            Add("sprWeaponLeeEnfield", 246, 100, -1, -1, 1);
+            Add("sprWeaponLeeEnfield", 283, 137, -1, -1, 2);
+            Add("sprWeaponLeeEnfield", 282, 132, -1, -1, 3);
+            Add("sprWeaponLeeEnfield", 256, 105, -1, -1, 4);
+            Add("sprWeaponSASG", 283, 94, -1, -1, 0);
+            Add("sprWeaponSASG", 298, 77, -1, -1, 1);
+            Add("sprWeaponSASG", 335, 89, -1, -1, 2);
+            Add("sprWeaponSASG", 314, 113, -1, -1, 3);
+            Add("sprWeaponSASG", 283, 88, -1, -1, 4);
+            Add("sprWeaponSASG", 281, 88, -1, -1, 42);
+            Add("sprWeaponSASG", 300, 79, -1, -1, 44);
+            Add("sprWeaponSASG", 342, 103, -1, -1, 45);
+            Add("sprWeaponSASG", 353, 109, -1, -1, 46);
+            Add("sprWeaponSASG", 332, 101, -1, -1, 47);
+            Add("sprWeaponSASG", 274, 57, -1, -1, 48);
+            Add("sprWeaponSASG", 275, 61, -1, -1, 49);
+            Add("sprWeaponSASG", 280, 86, -1, -1, 50);
+            Add("sprThompson", 286, 88, -1, -1, 0);
+            Add("sprThompson", 293, 83, -1, -1, 1);
+            Add("sprThompson", 294, 86, -1, -1, 2);
+            Add("sprThompson", 286, 81, -1, -1, 3);
+            Add("sprThompson", 293, 83, -1, -1, 4);
+            Add("sprThompson", 293, 85, -1, -1, 5);
+            Add("sprThompson", 285, 82, -1, -1, 6);
+            Add("sprWeaponBBGun", 272, 77, -1, -1, 0);
+            Add("sprWeaponBBGun", 282, 71, -1, -1, 1);
+            Add("sprWeaponBBGun", 280, 75, -1, -1, 2);
+            Add("sprWeaponBBGun", 276, 77, -1, -1, 3);
+            Add("sprWeaponBBGun", 277, 77, -1, -1, 14);
+            Add("sprWeaponLeeEnfieldOfficer", 222, 116, -1, -1, 0);
+            Add("sprWeaponLeeEnfieldOfficer", 246, 100, -1, -1, 1);
+            Add("sprWeaponLeeEnfieldOfficer", 283, 137, -1, -1, 2);
+            Add("sprWeaponLeeEnfieldOfficer", 282, 132, -1, -1, 3);
+            Add("sprWeaponLeeEnfieldOfficer", 256, 105, -1, -1, 4);
+            Add("sprWeaponSASGOfficer", 283, 94, -1, -1, 0);
+            Add("sprWeaponSASGOfficer", 298, 77, -1, -1, 1);
+            Add("sprWeaponSASGOfficer", 335, 89, -1, -1, 2);
+            Add("sprWeaponSASGOfficer", 314, 113, -1, -1, 3);
+            Add("sprWeaponSASGOfficer", 283, 88, -1, -1, 4);
+            Add("sprWeaponSASGOfficer", 281, 88, -1, -1, 43);
+            Add("sprWeaponSASGOfficer", 300, 79, -1, -1, 44);
+            Add("sprWeaponSASGOfficer", 342, 103, -1, -1, 45);
+            Add("sprWeaponSASGOfficer", 353, 109, -1, -1, 46);
+            Add("sprWeaponSASGOfficer", 332, 101, -1, -1, 47);
+            Add("sprWeaponSASGOfficer", 274, 57, -1, -1, 48);
+            Add("sprWeaponSASGOfficer", 275, 61, -1, -1, 49);
+            Add("sprWeaponSASGOfficer", 280, 86, -1, -1, 50);
             return result;
         }
     }

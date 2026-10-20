@@ -1,5 +1,7 @@
 # Dependencies and source provenance
 
+The embedded optional rendering helper includes MinHook (BSD 2-clause, Tsuda Kageyu), the RenderDoc DXBC checksum implementation (MIT, Baldur Karlsson and Crytek), and Solar Designer's public-domain MD5 implementation. Full notices and source are retained under `src/CulticVR.RenderingNative/third_party/` and in `DxbcChecksum.h`. No proprietary game shader bytecode is distributed.
+
 CulticVR's own code is offered under GPL-3.0-or-later; see LICENSE. This does not relicense its dependencies or the game.
 
 | Dependency | Tested version | Upstream/source | License information |

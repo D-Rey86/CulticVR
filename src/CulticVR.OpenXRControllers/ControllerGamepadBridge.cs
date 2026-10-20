@@ -56,6 +56,11 @@ namespace CulticVR.OpenXRControllers
             var rightGripPressed = Button(right, XRCommonUsages.gripButton);
             var leftStickPressed = Button(left, XRCommonUsages.primary2DAxisClick);
             var rightStickPressed = Button(right, XRCommonUsages.primary2DAxisClick);
+            var rightPrimary=Button(right,XRCommonUsages.primaryButton);
+            var rightSecondary=Button(right,XRCommonUsages.secondaryButton);
+            var leftPrimary=Button(left,XRCommonUsages.primaryButton);
+            var leftSecondary=Button(left,XRCommonUsages.secondaryButton);
+            var leftTrigger=Analog(left,XRCommonUsages.trigger);
             var leftGripForGame = leftGripPressed;
             var rightGripForGame = rightGripPressed;
             var menuGesture = false;
@@ -80,6 +85,7 @@ namespace CulticVR.OpenXRControllers
             var game = scrGameControl.Instance;
             var menu = game != null ? game.systemMenu : null;
             var leftRaw = Axis(left);
+            bool axesNeutral=leftRaw.sqrMagnitude<.04f && rightAxis.sqrMagnitude<.04f;
             // Stick swapping is independent of weapon handedness. It applies
             // only in gameplay; menus retain the physical left stick.
             if (VrSettings.SticksSwapped && game != null && game.gameState == 0)
@@ -109,7 +115,21 @@ namespace CulticVR.OpenXRControllers
             var rightTrigger = 0f;
             var hasRightTrigger = right.isValid && right.TryGetFeatureValue(XRCommonUsages.trigger, out rightTrigger);
             if (!hasRightTrigger)
-                rightTrigger = Button(right, XRCommonUsages.primaryButton) ? 1f : 0f;
+                rightTrigger = rightPrimary ? 1f : 0f;
+            bool neutral=!leftGripPressed && !rightGripPressed && !leftStickPressed && !rightStickPressed &&
+                !leftPrimary && !leftSecondary && !rightPrimary && !rightSecondary &&
+                leftTrigger<=.1f && rightTrigger<=.1f && axesNeutral;
+            // Release invisible wrist capture using THIS frame's shared head/grip sample,
+            // before a newly pressed trigger could be latched as a menu selection.
+            if(_wristQuickMenuCapturing) {
+                var wristNode=VrHandPose.OffhandNode;
+                bool focused=VrHandPose.TryHead(out var headPosition,out var headRotation) &&
+                    VrHandPose.TryGrip(wristNode,out var wristPosition,out var wristRotation) &&
+                    PalmAttention.LookingAt(headPosition,headRotation,
+                        PalmAttention.WristCenter(wristNode==XRNode.LeftHand,wristPosition,wristRotation),true);
+                if(!focused)_wristQuickMenuCapturing=false;
+            }
+            bool mapTap=AutomapInput.Tick(game,hud,neutral,_wristQuickMenuCapturing,out bool mapRelease);
             if (_wristQuickMenuCapturing && rightTrigger > 0.1f)
                 _suppressRightTriggerUntilRelease = true;
             else if (!_wristQuickMenuCapturing && rightTrigger <= 0.1f)
@@ -119,7 +139,7 @@ namespace CulticVR.OpenXRControllers
             {
                 leftStick = leftAxis,
                 rightStick = rightAxis,
-                leftTrigger = Analog(left, XRCommonUsages.trigger),
+                leftTrigger = leftTrigger,
                 rightTrigger = _wristQuickMenuCapturing || _suppressRightTriggerUntilRelease ? 0f : rightTrigger
             };
             // In left-hand mode the wrist pointer uses LT. Capture that trigger
@@ -132,10 +152,10 @@ namespace CulticVR.OpenXRControllers
             // These destinations come from CULTIC's serialized InputActionAsset,
             // observed in the flat sandbox. They retain its native action maps.
             state = state.WithButton(GamepadButton.South,
-                hasRightTrigger && Button(right, XRCommonUsages.primaryButton));
-            state = state.WithButton(GamepadButton.East, Button(right, XRCommonUsages.secondaryButton));
-            state = state.WithButton(GamepadButton.West, Button(left, XRCommonUsages.primaryButton));
-            state = state.WithButton(GamepadButton.North, Button(left, XRCommonUsages.secondaryButton));
+                hasRightTrigger && rightPrimary);
+            state = state.WithButton(GamepadButton.East, rightSecondary);
+            state = state.WithButton(GamepadButton.West, leftPrimary);
+            state = state.WithButton(GamepadButton.North, leftSecondary);
             state = state.WithButton(GamepadButton.LeftShoulder, leftGripForGame);
             state = state.WithButton(GamepadButton.RightShoulder, rightGripForGame);
             state = state.WithButton(GamepadButton.LeftStick,
@@ -143,6 +163,7 @@ namespace CulticVR.OpenXRControllers
             state = state.WithButton(GamepadButton.RightStick, rightStickPressed);
             state = state.WithButton(GamepadButton.Start,
                 menuGesture || Button(left, XRCommonUsages.menuButton) || Button(right, XRCommonUsages.menuButton));
+            state = state.WithButton(GamepadButton.Select,mapTap);
 
             state = state.WithButton(GamepadButton.DpadLeft, menuDirection == MenuDirection.Left);
             state = state.WithButton(GamepadButton.DpadRight, menuDirection == MenuDirection.Right);
@@ -160,15 +181,18 @@ namespace CulticVR.OpenXRControllers
                 (game.gameState != 1 && WorldStereoTrialPlugin.IsGameplayScene(SceneManager.GetActiveScene()))))
                 state = new GamepadState().WithButton(GamepadButton.Start,
                     menuGesture || Button(left, XRCommonUsages.menuButton) || Button(right, XRCommonUsages.menuButton));
+            if(mapTap || mapRelease)state=new GamepadState().WithButton(GamepadButton.Select,mapTap).WithButton(GamepadButton.Start,
+                menuGesture || Button(left,XRCommonUsages.menuButton) || Button(right,XRCommonUsages.menuButton));
 
             InputSystem.QueueStateEvent(_vrGamepad, state);
             _queuedWristDpadPulse = null;
         }
 
-        private void OnDestroy() => RemoveGamepad();
+        private void OnDestroy() { ShutdownHaptics();AutomapInput.Shutdown();RemoveGamepad(); }
 
         private void RemoveGamepad()
         {
+            AutomapInput.Reset();
             _optionsStick = default;
             _optionsMenuOwner = null;
             _leftStickWasPressed = false;

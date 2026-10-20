@@ -30,6 +30,10 @@ var cameraField = game.GetType("scrGameControl")!.GetField("mainCam")!;
 var playerCameraField = player.GetField("playerCamera")!;
 var playerParentField = player.GetField("playerCameraParent")!;
 var bulletMethod = player.GetMethod("castBullet")!;
+var hudField=player.GetField("playerHUD")!;
+var ammoField=temporary.GetField("ammo")!;
+var iconField=temporary.GetField("ammoIcon")!;
+var refreshMethod=game.GetType("scrPlayerHUD")!.GetMethod("refreshAmmo")!;
 var proxy = typeof(TestProxy).GetMethod(nameof(TestProxy.Camera))!;
 using var module = AssemblyDefinition.ReadAssembly(nativePath);
 var update = module.MainModule.Types.Single(t => t.Name == "scrPlayerControl").Methods.Single(m => m.Name == "Update");
@@ -43,8 +47,9 @@ var opcodeMap = typeof(EmitOpCodes).GetFields(BindingFlags.Public | BindingFlags
 List<CodeInstruction> NativeInstructions()
 {
     var generator = new DynamicMethod("BazookaFixture", typeof(void), Type.EmptyTypes).GetILGenerator();
-    var targets = update.Body.Instructions.Where(i => i.Operand is Instruction[])
-        .SelectMany(i => (Instruction[])i.Operand).Distinct().ToDictionary(i => i, _ => generator.DefineLabel());
+    var targets = update.Body.Instructions.SelectMany(i => i.Operand is Instruction[] many ? many :
+        i.Operand is Instruction single ? new[] { single } : Array.Empty<Instruction>())
+        .Distinct().ToDictionary(i => i, _ => generator.DefineLabel());
     return update.Body.Instructions.Select(i =>
     {
         object? operand = i.Operand;
@@ -52,13 +57,18 @@ List<CodeInstruction> NativeInstructions()
         {
             if (f.DeclaringType.Name == "scrPlayerControl" && f.Name == "tempWeapon") operand = tempField;
             if (f.DeclaringType.Name == "TempWeapon" && f.Name == "tWepType") operand = typeField;
+            if (f.DeclaringType.Name == "TempWeapon" && f.Name == "ammo") operand = ammoField;
+            if (f.DeclaringType.Name == "TempWeapon" && f.Name == "ammoIcon") operand = iconField;
+            if (f.DeclaringType.Name == "scrPlayerControl" && f.Name == "playerHUD") operand = hudField;
             if (f.DeclaringType.Name == "scrPlayerControl" && f.Name == "prefabBank") operand = prefabField;
             if (f.DeclaringType.Name == "scrGameControl" && f.Name == "mainCam") operand = cameraField;
             if (f.DeclaringType.Name == "scrPlayerControl" && f.Name == "playerCamera") operand = playerCameraField;
             if (f.DeclaringType.Name == "scrPlayerControl" && f.Name == "playerCameraParent") operand = playerParentField;
         }
         if (operand is MethodReference m && m.DeclaringType.Name == "scrPlayerControl" && m.Name == "castBullet") operand = bulletMethod;
+        if (operand is MethodReference h && h.DeclaringType.Name == "scrPlayerHUD" && h.Name == "refreshAmmo") operand = refreshMethod;
         if (operand is Instruction[] entries) operand = entries.Select(t => targets[t]).ToArray();
+        else if (operand is Instruction target) operand = targets[target];
         var result = new CodeInstruction(opcodeMap[i.OpCode.Value], operand);
         if (targets.TryGetValue(i, out var label)) result.labels.Add(label);
         // Extra metadata on camera reads tests that the production replacement
@@ -157,6 +167,8 @@ foreach (var connection in new[] { 0,1,2 })
 Console.WriteLine($"PASS: {cases} compiled bazooka-gate cases: patch readiness, player/temp identity, draw/drop/ready state, zoom, active gameplay, offline/local ownership and tracked-pose success/failure.");
 DisposableTests.Run(NativeInstructions, tempField, typeField, prefabField, cameraField, playerCameraField, playerParentField,
     bulletMethod, module, candidate);
+TemporaryHapticTests.Run(NativeInstructions,tempField,typeField,hudField,ammoField,iconField,refreshMethod,
+    prefabField,cameraField,playerCameraField,playerParentField,bulletMethod);
 using var accepted = AssemblyDefinition.ReadAssembly(Path.GetFullPath("deployment/backups/disposable-baseline-20261005/CulticVR.dll"));
 AdapterReplay.Run(accepted.MainModule.Types.Single(t => t.FullName == "CulticVR.AimTrial.AimTrialPlugin"),
     candidate.MainModule.Types.Single(t => t.FullName == "CulticVR.AimTrial.AimTrialPlugin"));
@@ -165,6 +177,7 @@ Console.WriteLine("STATIC ONLY: does not execute Unity, Harmony patch startup, h
 static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 public static class TestProxy
 {
+    public static void TemporaryShot(object player) {}
     public static object Camera(object game) => game;
     public static object OtherCamera(object game) => game;
     public static object Player(object player) => player;

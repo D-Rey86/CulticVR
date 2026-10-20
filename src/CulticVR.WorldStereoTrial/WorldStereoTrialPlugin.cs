@@ -10,7 +10,7 @@ using Uuvr;
 
 namespace CulticVR.WorldStereoTrial
 {
-    [BepInPlugin("culticvr.worldstereotrial", "CULTIC VR World Stereo", "0.8.3")]
+    [BepInPlugin("culticvr.worldstereotrial", "CULTIC VR World Stereo", "0.8.6")]
     [DefaultExecutionOrder(-100)]
     public sealed partial class WorldStereoTrialPlugin : BaseUnityPlugin
     {
@@ -57,23 +57,27 @@ namespace CulticVR.WorldStereoTrial
         private Vector3 _lastPhysicalHeadPosition;
         private float _baseVerticalFov = 90f;
         private float _normalScopeMagnification;
+        private float _normalRifleScopeMagnification;
         private float _scopeVerticalFov = 90f;
 
         private void Awake()
         {
             VrSettings.Bind(Config);
+            RenderingTrials.Initialize();
             _instance = this;
             InitializeXrResolutionPolicy();
             InitializePoseRotationFastPath();
             InitializeHiddenWorldGeometry();
             InitializeHeadCollision();
             InitializePhysicalLocomotion();
+            InitializeHeadViewFollowers();
             SceneManager.activeSceneChanged += OnSceneChanged;
             Application.onBeforeRender += OnBeforeRender;
         }
 
         private void OnDestroy()
         {
+            RemoveHeadViewFollowers();
             RemoveArtificialLocomotion();
             if (_instance == this) _instance = null;
             _locomotionHarmony?.UnpatchSelf();
@@ -83,6 +87,7 @@ namespace CulticVR.WorldStereoTrial
             Application.onBeforeRender -= OnBeforeRender;
             Restore();
             ResetPhysicalYaw();
+            RenderingTrials.Disable();
             if (!_quitting) RestoreXrResolutionScale();
         }
 
@@ -173,6 +178,7 @@ namespace CulticVR.WorldStereoTrial
             }
 
             if (_stereo == null) return;
+            ApplyRenderingTrials();
             UpdateScopeProjection(player!);
             _stereo.enabled = camera.enabled;
             _stereo.fieldOfView = camera.fieldOfView;
@@ -225,6 +231,7 @@ namespace CulticVR.WorldStereoTrial
         private void UpdateScopeProjection(scrPlayerControl player)
         {
             var targetFov = _baseVerticalFov;
+            var normalMagnification = _normalScopeMagnification;
             var scoped = false;
             var game = scrGameControl.Instance;
             if (game != null && player.weapon >= 0 && ZoomState(player) == 1)
@@ -237,6 +244,14 @@ namespace CulticVR.WorldStereoTrial
                         var upgradedZoom = game.gamePlayers[player.playerID].playerUpgrades[14, 2] *
                             Fg42ZoomLevel(player);
                         targetFov *= 0.55f - 0.3f * upgradedZoom;
+                        scoped = true;
+                    }
+                    else if (weapon.weaponTableID == 14)
+                    {
+                        // Exact native bolt-action zoom; the same selected-eye
+                        // separation limiter preserves its normal-scope disparity.
+                        targetFov *= 0.55f - 0.3f * (1.15f * Fg42ZoomLevel(player) + 0.25f);
+                        normalMagnification = _normalRifleScopeMagnification;
                         scoped = true;
                     }
                 }
@@ -254,7 +269,7 @@ namespace CulticVR.WorldStereoTrial
             var projectionScale = _scopeVerticalFov == _baseVerticalFov ? 1f :
                 Mathf.Tan(_baseVerticalFov * 0.5f * Mathf.Deg2Rad) /
                 Mathf.Tan(_scopeVerticalFov * 0.5f * Mathf.Deg2Rad);
-            var separationScale = ScopeStereoMath.SeparationScale(projectionScale, _normalScopeMagnification);
+            var separationScale = ScopeStereoMath.SeparationScale(projectionScale, normalMagnification);
             var sightingEye = separationScale < 1f && ScopeSightingEyeProvider != null ?
                 ScopeSightingEyeProvider() : Camera.StereoscopicEye.Right;
             if (_worldProjectionScale != null)
@@ -359,6 +374,7 @@ namespace CulticVR.WorldStereoTrial
             // its offset around the native camera again after collision.
             _stereo.transform.rotation = vrFacing;
             if (_skyStereo != null) _skyStereo.transform.rotation = vrFacing;
+            if (updatePosition) ApplyHeadViewFlashlight(vrFacing);
         }
 
         private void UpdatePhysicalPosition(Vector3 headPosition)
@@ -502,6 +518,7 @@ namespace CulticVR.WorldStereoTrial
 
             _source = source;
             _stereo = stereoCamera;
+            _originalRenderingPath = stereoCamera.renderingPath;
             _worldProjectionScale = worldProjectionScale;
             _skySource = skySource;
             _skyStereo = skyCamera;
@@ -512,6 +529,8 @@ namespace CulticVR.WorldStereoTrial
                 70f + game.prefsList["fieldOfView"] * 50f : 90f;
             _normalScopeMagnification = Mathf.Tan(_baseVerticalFov * 0.5f * Mathf.Deg2Rad) /
                 Mathf.Tan(_baseVerticalFov * 0.55f * 0.5f * Mathf.Deg2Rad);
+            _normalRifleScopeMagnification = Mathf.Tan(_baseVerticalFov * 0.5f * Mathf.Deg2Rad) /
+                Mathf.Tan(_baseVerticalFov * (0.55f - 0.3f * 0.25f) * 0.5f * Mathf.Deg2Rad);
             _scopeVerticalFov = _baseVerticalFov;
             _createdAt = Time.unscaledTime;
             _reportedReady = false;
@@ -522,6 +541,8 @@ namespace CulticVR.WorldStereoTrial
 
         private void Restore()
         {
+            RestoreRenderingTrials();
+            ResetHeadViewFollowers();
             DetachHiddenWorldGeometry();
             if (_worldImage != null) _worldImage.enabled = _originalWorldImageEnabled;
             if (_stereo != null) Destroy(_stereo.gameObject);

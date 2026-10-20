@@ -30,6 +30,15 @@ namespace CulticVR.WorldStereoTrial
         private Vector3 ConstrainHeadPosition(Vector3 desired)
         {
             var player = _player;
+            // Cinematics move the camera independently of the player's capsule.
+            // E2M0/E2M1 deliberately leave that capsule enabled: sweeping from
+            // its centre to the authored camera pins the view inside the level.
+            // Clear the saved gameplay contact so it cannot survive the handoff.
+            if (player != null && player.playerHUD != null && player.playerHUD.cutsceneState != 0)
+            {
+                ResetHeadCollision();
+                return desired;
+            }
             var body = player != null ? player.myCollider : null;
             if (!_headCollisionEnabled.Value || body == null || !body.enabled ||
                 player!.isDead || player.state == 69)

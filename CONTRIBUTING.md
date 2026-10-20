@@ -3,11 +3,14 @@
 Use the .NET 8 SDK and a local supported Windows x64 CULTIC installation with BepInEx 5.4.23.5 and UUVR 0.4.0 installed. Do not commit game assemblies, extracted artwork, logs, saves or dependency binaries.
 
 ```powershell
+.\src\CulticVR.RenderingNative\Build.ps1
 dotnet build .\src\CulticVR\CulticVR.csproj -c Release -p:GameDir='D:\SteamLibrary\steamapps\common\CULTIC'
 .\Test-CulticVR-Package.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC'
 ```
 
 The `GameDir` property supplies local reference assemblies, which are not copied into the production output. Without it, the project defaults to a private fixture path absent from a public clone. Build the unified project above; names containing `Trial` retain stable plugin/config identities.
+
+The rendering helper requires Visual Studio C++ x64 build tools with a Windows SDK. Our native code is embedded in the unified DLL and extracted once to a content-hashed BepInEx cache directory. Supported complete shader fingerprints are checked at creation; no game shader bytecode is bundled. Unsupported shaders pass through unchanged. Zero-light write suppression and conservative palette search are automatic during VR rendering. Deferred Rendering remains optional and off by default because it changes fog and potentially other visuals. Tests on the maintainer's hardware do not certify all views, effects or other hardware.
 
 The supported `CULTIC_Data/Managed/Assembly-CSharp.dll` SHA-256 is `0AC77697A3F08589E20AF683DA2DE78E664DBE0726397280905608423E557CDC`. Game updates require review of the native contracts patched by the mod.
 
@@ -21,7 +24,7 @@ Other test projects require local Unity/game references; pass `-p:GameDir='your 
 
 ```powershell
 .\packaging\Fetch-ReleaseInputs.ps1
-.\packaging\Build-Release.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC' -Version '1.0.0' -Draft
+.\packaging\Build-Release.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC' -Version '1.1.0' -Draft
 ```
 
 This exports an explicit source tree into ignored `artifacts`, builds it, checks release hygiene and creates a mod ZIP/checksum. It does not publish, deploy or launch the game. `-Draft` marks an unapproved package nonpublic; omit it only after release review.

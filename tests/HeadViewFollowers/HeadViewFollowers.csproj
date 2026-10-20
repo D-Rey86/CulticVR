@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/CulticVR.WorldStereoTrial/HeadViewReadPatch.cs" Link="HeadViewReadPatch.cs" />
+    <Reference Include="0Harmony"><HintPath>G:/Games/Steam/steamapps/common/CULTIC/BepInEx/core/0Harmony.dll</HintPath></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>G:/Games/Steam/steamapps/common/CULTIC/BepInEx/core/Mono.Cecil.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

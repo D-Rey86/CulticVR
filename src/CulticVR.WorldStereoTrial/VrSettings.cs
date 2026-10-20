@@ -17,6 +17,12 @@ namespace CulticVR.WorldStereoTrial
         public static ConfigEntry<bool> SwapSticks = null!;
         public static ConfigEntry<float> SpriteWidth = null!;
         public static ConfigEntry<float> SpriteHeight = null!;
+        public static ConfigEntry<bool> DeferredTrial = null!;
+        public static ConfigEntry<bool> PalmMap = null!;
+        public static ConfigEntry<bool> ControllerHaptics = null!;
+        public static ConfigEntry<float> ControllerHapticStrength = null!;
+        public static ConfigEntry<bool> VestHaptics = null!;
+        public static ConfigEntry<float> VestHapticStrength = null!;
         private static ConfigFile? _file;
         public static bool MotionControls => ControllerMode == null || !ControllerMode.Value;
         public static bool LeftWeapon => LeftHand != null && LeftHand.Value;
@@ -41,8 +47,14 @@ namespace CulticVR.WorldStereoTrial
             ControllerMode = file.Bind("Controls","GamepadMode",false,"Use a regular gamepad with HMD aim. Disabled by default for tracked motion controls. Motion controllers can still navigate menus in this mode.");
             LeftHand = file.Bind("Controls","LeftHandWeapon",false,"Hold and aim weapons with the left hand; independent of stick assignments.");
             SwapSticks = file.Bind("Controls","SwapMovementTurnSticks",false,"Swap movement and turning stick assignments; button assignments stay unchanged.");
+            PalmMap = file.Bind("Controls","PalmUpMap",true,"Look at the palm of your weapon hand (right by default) to open/close the native map. Look away before repeating. No raising, lowering, steady hold or neutral-stick gesture is required. Uses a larger stationary VR UI panel.");
+            ControllerHaptics = file.Bind("Haptics","MotionControllers",true,"Custom firearm recoil in the weapon hand and health/armor damage in both hands. OpenXR motion controls only; does not alter regular gamepad rumble.");
+            ControllerHapticStrength = Float(file,"Haptics","ControllerStrength",.6f,0f,1f,"Motion-controller haptic strength.");
+            VestHaptics = file.Bind("Haptics","TactSuit",false,"Optional X40 recoil and traced incoming attack patterns. Front/back uses VR facing yaw, not measured torso orientation. Requires Player and vest connected. Local only; never launches Player. Defaults OFF.");
+            VestHapticStrength = Float(file,"Haptics","VestStrength",.4f,0f,1f,"bHaptics vest haptic strength, independent of controller strength.");
             SpriteWidth = Float(file,"Weapons","SpriteWidth",1f,.5f,2f,"Weapon artwork width multiplier; muzzle and scope landmarks use the same dimensions.");
             SpriteHeight = Float(file,"Weapons","SpriteHeight",1f,.5f,2f,"Weapon artwork height multiplier; muzzle and scope landmarks use the same dimensions.");
+            DeferredTrial = file.Bind("Rendering Trials","Deferred",false,"Live deferred rendering on the existing stereo world camera. Compare fog, transparency, scopes and lighting; OFF restores the original camera path.");
         }
         private static ConfigEntry<float> Float(ConfigFile file,string section,string key,float value,float min,float max,string description) =>
             file.Bind(section,key,value,new ConfigDescription(description,new AcceptableValueRange<float>(min,max)));
@@ -64,6 +76,10 @@ namespace CulticVR.WorldStereoTrial
             Set(Resolution,1f); Set(Separation,1f); Set(Teleport,false); Set(SnapTurn,false);
             Set(SnapDegrees,45); Set(ControllerMode,false); Set(LeftHand,false); Set(SwapSticks,false);
             Set(SpriteWidth,1f); Set(SpriteHeight,1f);
+            Set(DeferredTrial,false);
+            Set(PalmMap,true);
+            Set(ControllerHaptics,true); Set(ControllerHapticStrength,.6f);
+            Set(VestHaptics,false); Set(VestHapticStrength,.4f);
         }
     }
 }

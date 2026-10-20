@@ -38,22 +38,25 @@ namespace CulticVR.AimTrial
             // Boxed labels bridge installed framework Harmony/netstandard safely.
             var labelField = typeof(CodeInstruction).GetField("labels", BindingFlags.Public | BindingFlags.Instance);
             if (labelField == null) throw new MissingFieldException("Harmony labels unavailable");
-            var bounds = new[] { -1, -1, -1 };
+            if (instructions[dispatch + 1].opcode != OpCodes.Br && instructions[dispatch + 1].opcode != OpCodes.Br_S)
+                throw new InvalidOperationException("Disposable default exit changed");
+            var exit = instructions[dispatch + 1].operand;
+            var bounds = new[] { -1, -1, -1, -1 };
             for (var index = dispatch + 1; index < instructions.Count; index++)
             {
                 var labels = labelField.GetValue(instructions[index]) as IList ??
                     throw new InvalidOperationException("Harmony label list unavailable");
                 for (var slot = 0; slot < bounds.Length; slot++)
                 {
-                    if (!labels.Contains(entries.GetValue(slot + 1))) continue;
+                    if (!labels.Contains(slot == 3 ? exit : entries.GetValue(slot + 1))) continue;
                     if (bounds[slot] != -1) throw new InvalidOperationException("Ambiguous disposable case label");
                     bounds[slot] = index;
                 }
             }
-            if (bounds[0] <= dispatch || bounds[1] <= bounds[0] || bounds[2] <= bounds[1])
+            if (bounds[0] <= dispatch || bounds[1] <= bounds[0] || bounds[2] <= bounds[1] || bounds[3] <= bounds[2])
                 throw new InvalidOperationException("Disposable case boundaries changed");
             var rewrites = new List<KeyValuePair<CodeInstruction, MethodInfo>>(15);
-            for (var slot = 0; slot < 2; slot++)
+            for (var slot = 0; slot < 3; slot++)
             {
                 var cameras = 0; var players = 0; var parents = 0; var bullets = 0;
                 var prefabs = new List<int>(3);
@@ -76,12 +79,13 @@ namespace CulticVR.AimTrial
                     }
                     if (replacement != null) rewrites.Add(new KeyValuePair<CodeInstruction, MethodInfo>(instruction, replacement));
                 }
-                var expectedPrefabs = slot == 0 ? new[] { 0, 32, 33 } : new[] { 36 };
-                if (cameras != (slot == 0 ? 6 : 5) || players != (slot == 0 ? 2 : 0) || parents != (slot == 0 ? 2 : 0) ||
-                    bullets != (slot == 0 ? 1 : 0) || !prefabs.SequenceEqual(expectedPrefabs))
+                var expectedPrefabs = slot == 0 ? new[] { 0, 32, 33 } : slot == 1 ? new[] { 36 } : new[] { 0 };
+                if (cameras != (slot == 0 ? 6 : slot == 1 ? 5 : 4) || players != (slot == 0 ? 2 : 0) ||
+                    parents != (slot == 0 ? 2 : slot == 1 ? 0 : 1) ||
+                    bullets != (slot == 1 ? 0 : 1) || !prefabs.SequenceEqual(expectedPrefabs))
                     throw new InvalidOperationException($"Disposable case {slot + 1} firing structure changed");
             }
-            // Validate BOTH branches before mutating either; independent owner
+            // Validate all three branches before mutating any; independent owner
             // can cleanly fail back without partially patching accepted paths.
             foreach (var rewrite in rewrites)
             {

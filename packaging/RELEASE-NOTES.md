@@ -1,20 +1,18 @@
-# Chapter One Release — 1.0.0
+# CULTIC VR 1.1.0 — Chapter Two and haptics
 
-First release of CULTIC VR, an unofficial OpenXR mod for the Windows Steam game. The mod source is available under GPL-3.0-or-later.
+Adds Chapter Two support while retaining Chapter One and Interlude gameplay. All weapons and bHaptics have been confirmed working during the maintainer's near-complete playthrough; the final level remains unfinished at release preparation time.
 
-**This release supports Chapter One only. Chapter Two support is planned and will be worked on separately.**
+- Controller aiming and muzzle placement for the bolt-action rifle, Thompson, SASG, BB gun, revolver, pitchfork and night stick, including scoped rifle aiming and limited-use weapons.
+- Chapter Two automap on a larger stationary VR panel: look at your weapon-hand palm to toggle it. The wrist radial wheel now also requires looking at the offhand, preventing accidental capture outside your view.
+- Motion-controller feedback for firearms, successful melee contacts, incoming damage, explosions and supported world impacts, with its own strength control.
+- Optional bHaptics TactSuit feedback: weapon recoil, directional incoming attacks, pickups, healing, explosions, supported cinematic/world impacts and a fast heartbeat at 25 health or less. Explosions stay strong at any distance. TactSuit X40 tested; enable the option with Player and the vest connected. Vest feedback defaults off and has an independent strength slider.
+- Flashlight and held throwables follow head pitch and yaw. Improved Chapter Two/Interlude opening cinematic presentation and wrist HUD restoration after loading saves.
+- Automatic zero-light write suppression and palette optimization on supported D3D11 shaders. Deferred Rendering remains optional and off by default; it removes fog in tested areas and can change lighting/transparency.
 
-Includes stereo/head tracking, motion-controller aiming, controller-mounted weapon artwork and offhand items, scoped aiming, physical TNT/Molotov ignition, head collision, roomscale walking/crouching, a wrist menu/HUD, and native-styled VR Options.
+Download and extract the Windows x64 ZIP, then run **Install CulticVR.exe**. BepInEx, UUVR and required OpenXR components are included; no extra mod-loader downloads or terminal commands are needed. Existing supported installer installations can update in place; saves and settings are preserved. Manual installations have File Explorer instructions in README.md. A legitimate copy of CULTIC and Chapter Two DLC for that campaign are required.
 
-The game's **D-pad shortcuts are a radial wheel on the left controller**, with **health and ammo counts** on the wrist display. Turn your left palm upward to reveal it, then point and select with the right controller's trigger. Left Hand Mode moves it to the opposite offhand.
+Tested with Quest 3, Virtual Desktop, NVIDIA RTX 5070 Ti and TactSuit X40. Other headsets, GPUs and vest models remain unverified; multiplayer is unsupported. Improvements do not guarantee 90 FPS in every area. Keep the default RelativeTransform tracking mode; tracking-origin recentering retains known viewpoint/body-rotation edge cases. Physical TNT throwing and experimental hidden-world geometry suppression remain off by default.
 
-Download the Windows x64 ZIP, extract it, and double-click **Install CulticVR.exe**. BepInEx, UUVR and required OpenXR components are included. The installer finds Steam installations and supports updating/removal; no separate downloads or terminal commands are needed. A legitimate copy of CULTIC is required. The source ZIP is for developers; the SHA256SUMS file covers both downloads.
+The download contains no performance recorder, research probes, personal settings, game assemblies or extracted artwork. GPL-3.0-or-later mod source, dependency sources/notices and SHA256SUMS accompany the package. The native rendering helper is embedded in CulticVR.dll.
 
-If the installer does not work, the README includes **manual installation using File Explorer** and the bundled payload files, with no additional downloads or commands.
-
-Tested headset setup: Quest 3 / Virtual Desktop / NVIDIA RTX 5070 Ti. Other PCVR headsets and AMD systems are not certified. Chapter Two DLC and multiplayer are unsupported. MG/Maxim and LP42 support lacks explicit headset acceptance.
-
-Intermittent performance drops remain under investigation; their cause has not been conclusively attributed. Tracking-origin recentering has known viewpoint/body-rotation edge cases. Read the README's known limitations before installation. The hidden-world geometry optimization remains OFF by default. This release has no capture companion or research probes.
-
-Packaging validation covers a fresh source export build, release hygiene, installation in a path with spaces, update/rollback, tamper/path rejection, removal of first-launch generated files and reinstall. It does not certify new hardware or replace native VR testing.
-
+Validation includes a fresh source-export build, package hygiene, managed/static/native replay coverage, installer transactions and offscreen layout checks. These supplement the reported gameplay testing and do not certify untested hardware or the unfinished final level. This is a local release candidate until publication is approved.
