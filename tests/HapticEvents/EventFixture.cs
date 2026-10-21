@@ -141,11 +141,11 @@ public class scrE2M0ElevatorButton {}
 public class scrE2M7BridgeController {}
 public class scrE2M9TrainController {}
 public class scrEBM1MausoleumEyePuzzle {}
-public class scrFreightElevator {}
+public class scrFreightElevator {public int state;}
 public class scrFreightElevatorPlatform {public int state;}
 public class scrMovingPlatform {public bool isStationary;public Transform? parentObject;}
-public class scrOfficeElevator {}
-public class scrDumbwaiter {}
+public class scrOfficeElevator {public int state;}
+public class scrDumbwaiter {public int state;}
 public class scrE2M2RollingDoorPanel {}
 public class scrDoor {}
 

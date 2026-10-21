@@ -16,6 +16,9 @@ namespace CulticVR.OpenXRControllers
         {
             internal Transform? Parent;
             internal scrFreightElevatorPlatform? Lift;
+            internal scrFreightElevator? Freight;
+            internal scrOfficeElevator? Office;
+            internal scrDumbwaiter? Dumbwaiter;
         }
         private static ConditionalWeakTable<scrMovingPlatform,LiftBinding> _bindings = new ConditionalWeakTable<scrMovingPlatform,LiftBinding>();
         private static Harmony? _harmony;
@@ -74,11 +77,20 @@ namespace CulticVR.OpenXRControllers
             if(binding.Parent!=platform.parentObject){
                 binding.Parent=platform.parentObject;
                 binding.Lift=binding.Parent.GetComponent<scrFreightElevatorPlatform>();
+                binding.Freight=binding.Lift==null?binding.Parent.GetComponent<scrFreightElevator>():null;
+                binding.Office=binding.Lift==null&&binding.Freight==null?binding.Parent.GetComponent<scrOfficeElevator>():null;
+                binding.Dumbwaiter=binding.Lift==null&&binding.Freight==null&&binding.Office==null?binding.Parent.GetComponent<scrDumbwaiter>():null;
             }
-            if(binding.Lift==null||binding.Lift.state!=2)return;
+            float amount;
+            if(binding.Lift!=null){if(binding.Lift.state!=2)return;amount=1f;}
+            else if(binding.Freight!=null){if(binding.Freight.state!=2)return;amount=1f;}
+            else if(binding.Office!=null){if(binding.Office.state!=2)return;amount=.49f;}
+            else if(binding.Dumbwaiter!=null){if(binding.Dumbwaiter.state!=2)return;amount=.49f;}
+            else return;
             // Reuse the existing bounded, lower-front/back world-rumble output.
             // This value describes machinery vibration, not damage or an explosion.
-            _notify(player!,1f);
+            // The shared scheduler uses sqrt(amount), so .49 gives 70% amplitude.
+            _notify(player!,amount);
         }
 
         internal static void Shutdown()

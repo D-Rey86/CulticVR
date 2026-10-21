@@ -29,7 +29,7 @@ internal static class ElevatorRideTests
         foreach(int state in new[]{0,1,3}){Clear();lift.state=state;Move();check(owner.VestOutput.Frames.Count==0,"Idle, alarm and stopping states do not fabricate a ride");}lift.state=2;
         Clear();platform.isStationary=false;Move();check(owner.VestOutput.Frames.Count==0,"Unrelated path-driven platform output unchanged");platform.isStationary=true;
         var unrelated=new Transform();platform.parentObject=unrelated;Clear();Move();Move();
-        check(unrelated.GetComponentCalls==1&&owner.VestOutput.Frames.Count==0,"Unsupported parent cached without repeated searches or output");
+        check(unrelated.GetComponentCalls==4&&owner.VestOutput.Frames.Count==0,"Unsupported parent cached without repeated searches or output");
         var replacement=new Transform{Component=lift};platform.parentObject=replacement;Clear();Move();
         check(replacement.GetComponentCalls==1&&owner.VestOutput.Frames.Count==1,"Changed parent invalidates cached lift binding");
         Clear();VrSettings.ControllerHaptics.Value=false;owner.Tick();Move();
@@ -54,6 +54,27 @@ internal static class ElevatorRideTests
         for(int i=0;i<10000;i++){Time.realtimeSinceStartupAsDouble+=.02;Move();owner.Clear();}
         check(GC.GetAllocatedBytesForCurrentThread()==bytes,"Steady elevator dispatch allocates zero managed bytes");
         Clear();Time.realtimeSinceStartupAsDouble+=.5;owner.Tick();check(owner.VestOutput.Frames.Count==0,"No timer-driven ride persists after motion stops");
+        // Exercise each new native component through the real consumer/scheduler/output path.
+        var freight=new scrFreightElevator();var office=new scrOfficeElevator();var dumbwaiter=new scrDumbwaiter();
+        foreach(var spec in new (object lift,Action<int> state,float scale,int lookups)[]{
+            (freight,v=>freight.state=v,1f,2),(office,v=>office.state=v,.7f,3),(dumbwaiter,v=>dumbwaiter.state=v,.7f,4)}){
+            var carrier=new Transform{Component=spec.lift};platform.parentObject=carrier;spec.state(2);
+            Clear();Move();var travel=owner.VestOutput.Frames.Single();
+            check(Math.Abs(travel.Amplitude-.2925f*spec.scale)<.00001f&&travel.Front==frame.Front&&travel.Back==frame.Back&&travel.Seconds==.1f,"Each lift gives expected vest travel strength/layout/duration");
+            check(owner.Output.Pulses.Count==2,"Each lift drives both controllers");
+            foreach(var pulse in owner.Output.Pulses)check(Math.Abs(pulse.Amplitude-.24375f*spec.scale)<.00001f,"Controller travel strength scales with lift size");
+            foreach(int state in new[]{0,1,3}){Clear();spec.state(state);Move();check(owner.VestOutput.Frames.Count==0&&owner.Output.Pulses.Count==0,"Each lift silent outside traveling state");}spec.state(2);
+            Clear();ElevatorRideHooks.MoveRider(p.transform,p.transform.position,platform);owner.Tick();check(owner.VestOutput.Frames.Count==0&&owner.Output.Pulses.Count==0,"Each stationary lift silent");
+            Clear();VrSettings.ControllerHaptics.Value=false;owner.Tick();Move();check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Count==1,"Each lift supports vest alone");VrSettings.ControllerHaptics.Value=true;
+            Clear();VrSettings.VestHaptics.Value=false;owner.Tick();Move();check(owner.Output.Pulses.Count==2&&owner.VestOutput.Frames.Count==0,"Each lift supports controllers alone");VrSettings.VestHaptics.Value=true;
+            Clear();g.gameState=1;owner.Tick();Move();g.gameState=0;owner.Tick();check(owner.VestOutput.Frames.Count==0&&owner.Output.Pulses.Count==0,"Each lift pause guard prevents stale feedback");
+            for(int i=0;i<1000;i++){Time.realtimeSinceStartupAsDouble+=.02;Move();owner.Clear();}
+            long allocated=GC.GetAllocatedBytesForCurrentThread();
+            for(int i=0;i<10000;i++){Time.realtimeSinceStartupAsDouble+=.02;Move();owner.Clear();}
+            check(GC.GetAllocatedBytesForCurrentThread()==allocated,"Each lift allocates zero in steady movement");
+            check(carrier.GetComponentCalls==spec.lookups,"Each lift resolves component only on binding");
+        }
+        platform.parentObject=replacement;
         ElevatorRideHooks.Shutdown();Clear();before=p.transform.position;Move();
         check(p.transform.position.y==before.y-.1f&&owner.VestOutput.Frames.Count==0,"Uninstalled optional observer preserves native movement");
         VrSettings.VestHapticStrength.Value=1;owner.Clear();
