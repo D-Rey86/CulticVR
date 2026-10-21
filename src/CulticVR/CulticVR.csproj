@@ -14,6 +14,7 @@
     <Compile Include="..\CulticVR.OpenXRControllers\ControllerHapticTransport.cs" Link="ControllerHapticTransport.cs" />
     <Compile Include="..\CulticVR.OpenXRControllers\HapticPatterns.cs" Link="HapticPatterns.cs" />
     <Compile Include="..\CulticVR.OpenXRControllers\ExpandedWorldRumbleHooks.cs" Link="ExpandedWorldRumbleHooks.cs" />
+    <Compile Include="..\CulticVR.OpenXRControllers\ElevatorRideHooks.cs" Link="ElevatorRideHooks.cs" />
     <Compile Include="..\CulticVR.OpenXRControllers\ExpansionEventSelectors.cs" Link="ExpansionEventSelectors.cs" />
     <Compile Include="..\CulticVR.OpenXRControllers\HapticExpansion.cs" Link="HapticExpansion.cs" />
     <Compile Include="..\CulticVR.OpenXRControllers\HelicopterNearMiss.cs" Link="HelicopterNearMiss.cs" />

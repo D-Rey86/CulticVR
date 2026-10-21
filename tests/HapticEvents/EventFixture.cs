@@ -24,7 +24,7 @@ namespace UnityEngine {
         public static Quaternion operator *(Quaternion a,Quaternion b)=>new(){Value=a.Value*b.Value};
         public static Vector3 operator *(Quaternion q,Vector3 v){var r=System.Numerics.Vector3.Transform(new(v.x,v.y,v.z),q.Value);return new(r.X,r.Y,r.Z);}
     }
-    public sealed class Transform { public Vector3 eulerAngles,position; }
+    public sealed class Transform { public Vector3 eulerAngles,position;public object? Component;public int GetComponentCalls;public T? GetComponent<T>() where T:class {GetComponentCalls++;return Component as T;} }
     public sealed class Camera { public Transform transform=new(); }
 }
 namespace UnityEngine.XR { public static class XRSettings { public static bool isDeviceActive=true; } }
@@ -142,7 +142,8 @@ public class scrE2M7BridgeController {}
 public class scrE2M9TrainController {}
 public class scrEBM1MausoleumEyePuzzle {}
 public class scrFreightElevator {}
-public class scrFreightElevatorPlatform {}
+public class scrFreightElevatorPlatform {public int state;}
+public class scrMovingPlatform {public bool isStationary;public Transform? parentObject;}
 public class scrOfficeElevator {}
 public class scrDumbwaiter {}
 public class scrE2M2RollingDoorPanel {}

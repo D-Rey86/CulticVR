@@ -59,6 +59,8 @@ namespace CulticVR.OpenXRControllers
             try{WorldRumbleHooks.Install(WorldShakeAccepted,WorldImpact,ExplosionHapticCapture.ScriptedDetonation);}
             catch(Exception e){WorldRumbleHooks.Shutdown();Logger.LogWarning("Optional world rumble unavailable: "+e.Message);}
             InitializeExpandedHaptics();
+            try{ElevatorRideHooks.Install(WorldShakeAccepted);}
+            catch(Exception e){ElevatorRideHooks.Shutdown();Logger.LogWarning("Optional elevator ride haptics unavailable: "+e.Message);}
         }
         private void PatchEvent(string target,string before,string after,string? finalizer=null)=>_hapticHarmony!.Patch(AccessTools.Method(typeof(scrPlayerControl),target),
             prefix:new HarmonyMethod(typeof(OpenXRControllersPlugin),before),postfix:new HarmonyMethod(typeof(OpenXRControllersPlugin),after),
@@ -235,6 +237,7 @@ namespace CulticVR.OpenXRControllers
             _helicopterNearMissHarmony?.UnpatchSelf();
             _additionalProducerHarmony?.UnpatchSelf();
             WorldRumbleHooks.Shutdown();
+            ElevatorRideHooks.Shutdown();
             _expansionHarmony?.UnpatchSelf();_expandedEventsReady=false;ExpandedWorldRumbleHooks.Shutdown();
             SceneManager.activeSceneChanged-=HapticSceneChanged;if(_hapticOwner==this)_hapticOwner=null;
         }

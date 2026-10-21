@@ -10,6 +10,8 @@
     <Compile Include="../../src/CulticVR.OpenXRControllers/ExpandedWorldRumbleHooks.cs" Link="ExpandedWorldRumbleHooks.cs" />
     <Compile Include="../../src/CulticVR.OpenXRControllers/ExpansionEventSelectors.cs" Link="ExpansionEventSelectors.cs" />
     <Compile Include="ExpansionNativeTests.cs" />
+    <Compile Include="../../src/CulticVR.OpenXRControllers/ElevatorRideHooks.cs" Link="ElevatorRideHooks.cs" />
+    <Compile Include="ElevatorNativeTests.cs" />
     <Reference Include="Unity.Netcode.Runtime"><HintPath>$(GameDir)/CULTIC_Data/Managed/Unity.Netcode.Runtime.dll</HintPath></Reference>
     <Compile Include="../../src/CulticVR.OpenXRControllers/HapticProducerTags.cs" Link="HapticProducerTags.cs" />
     <Compile Include="../../src/CulticVR.OpenXRControllers/HapticPatterns.cs" Link="HapticPatterns.cs" />

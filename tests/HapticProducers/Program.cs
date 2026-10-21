@@ -11,7 +11,7 @@ AssemblyLoadContext.Default.Resolving+=(_,name)=>{
     }
     return null;
 };
-ProducerReplay.Run(); NativeWorldTests.Run(); AdditionalProducerTests.Run(); WorldRumbleNativeTests.Run();ExpansionNativeTests.Run();
+ProducerReplay.Run(); NativeWorldTests.Run(); AdditionalProducerTests.Run(); WorldRumbleNativeTests.Run();ExpansionNativeTests.Run();ElevatorNativeTests.Run();
 
 internal static class ProducerReplay
 {
