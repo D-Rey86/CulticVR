@@ -48,6 +48,7 @@ namespace CulticVR.OpenXRControllers
         };
         private static readonly Dictionary<MethodBase,Producer> Producers=new Dictionary<MethodBase,Producer>();
         [ThreadStatic] private static bool _scoped;
+        [ThreadStatic] private static bool _restrained;
         private static Action<scrPlayerControl,float>? _notify;
         private static Action? _impact;
         private static Action<GameObject>? _blast;
@@ -104,12 +105,15 @@ namespace CulticVR.OpenXRControllers
         // callback supplies its amount before screen-shake preference scaling.
         internal static void GameAdd(scrGameControl game,float amount,Vector3 position,bool ignoreDistance)
         {bool previous=_scoped;_scoped=true;try{game.addShake(amount,position,ignoreDistance);}finally{_scoped=previous;}}
+        // Limit only haptics after native distance attenuation; screen shake is untouched.
+        internal static void RestrainedGameAdd(scrGameControl game,float amount,Vector3 position,bool ignoreDistance)
+        {bool previous=_restrained;_restrained=true;try{GameAdd(game,amount,position,ignoreDistance);}finally{_restrained=previous;}}
         internal static void GameSet(scrGameControl game,float amount,Vector3 position,bool ignoreDistance)
         {bool previous=_scoped;_scoped=true;try{game.setShake(amount,position,ignoreDistance);}finally{_scoped=previous;}}
         internal static void PlayerAdd(scrPlayerControl player,float amount)
         {bool previous=_scoped;_scoped=true;try{player.addShake(amount);}finally{_scoped=previous;}}
         internal static void Accepted(scrPlayerControl __instance,float amount)
-        {if(_scoped)_notify?.Invoke(__instance,amount);}
+        {if(_scoped)_notify?.Invoke(__instance,_restrained?Math.Min(amount,.49f):amount);}
         private static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions,MethodBase __originalMethod)=>Rewrite(instructions,Producers[__originalMethod]);
         internal static IEnumerable<CodeInstruction> Rewrite(IEnumerable<CodeInstruction> instructions,Producer producer)
         {
@@ -133,6 +137,6 @@ namespace CulticVR.OpenXRControllers
             if(adds!=producer.Add||sets!=producer.Set||players!=producer.Player)throw new InvalidOperationException("Native world shake call sites changed: "+producer.Type.Name+"."+producer.Method);
             return result;
         }
-        internal static void Shutdown(){_harmony?.UnpatchSelf();_harmony=null;_notify=null;_impact=null;_blast=null;_scoped=false;Producers.Clear();}
+        internal static void Shutdown(){_harmony?.UnpatchSelf();_harmony=null;_notify=null;_impact=null;_blast=null;_scoped=false;_restrained=false;Producers.Clear();}
     }
 }

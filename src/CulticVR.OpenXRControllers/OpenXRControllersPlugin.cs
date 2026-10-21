@@ -11,7 +11,7 @@ using UnityEngine.XR.OpenXR.Features;
 
 namespace CulticVR.OpenXRControllers
 {
-    [BepInPlugin("culticvr.openxrcontrollers", "CULTIC VR OpenXR Controller Bootstrap", "0.1.28")]
+    [BepInPlugin("culticvr.openxrcontrollers", "CULTIC VR OpenXR Controller Bootstrap", "0.1.29")]
     [BepInDependency("raicuparta.uuvr-modern")]
     public sealed partial class OpenXRControllersPlugin : BaseUnityPlugin
     {

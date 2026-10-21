@@ -10,6 +10,15 @@ namespace CulticVR.OpenXRControllers
     internal static class ExpandedWorldRumbleHooks
     {
         internal static readonly WorldRumbleHooks.Producer[] Catalog={
+            new WorldRumbleHooks.Producer(typeof(scrDamageDropper),"Update",player:1),
+            new WorldRumbleHooks.Producer(typeof(scrArchonTrap),"tryGrab",set:1),
+            new WorldRumbleHooks.Producer(typeof(scrArchonTrap),"OnTriggerStay",set:1),
+            new WorldRumbleHooks.Producer(typeof(scrAmalgamation),"Update",add:1),
+            new WorldRumbleHooks.Producer(typeof(scrTank),"fireCannon",add:1),
+            new WorldRumbleHooks.Producer(typeof(scrIncinerator),"onFrameAdvance",add:1),
+            new WorldRumbleHooks.Producer(typeof(scrAmalgamationMesh),"fireCannon",add:2),
+            new WorldRumbleHooks.Producer(typeof(scrArchon),"beamSingleFire",add:1),
+            new WorldRumbleHooks.Producer(typeof(scrArchon),"beamSweepFire",add:1),
             new WorldRumbleHooks.Producer(typeof(scrE2M0AmalgamCutscene),"Update",add:1),
             new WorldRumbleHooks.Producer(typeof(scrE2M9Cutscene),"Update",add:1),
             new WorldRumbleHooks.Producer(typeof(scrAbomination),"leftArmSlam",add:1),
@@ -49,12 +58,20 @@ namespace CulticVR.OpenXRControllers
             var result=WorldRumbleHooks.Rewrite(source,site);
             bool cinematic=site.Type==typeof(scrE2M0AmalgamCutscene)||site.Type==typeof(scrE2M9Cutscene);
             var from=typeof(WorldRumbleHooks).GetMethod("GameAdd",BindingFlags.Static|BindingFlags.NonPublic)!;
+            bool restrained=Restrained(site);
+            var firing=typeof(WorldRumbleHooks).GetMethod("RestrainedGameAdd",BindingFlags.Static|BindingFlags.NonPublic)!;
             var to=typeof(ExpandedWorldRumbleHooks).GetMethod(nameof(CinematicGameAdd),BindingFlags.Static|BindingFlags.NonPublic)!;
             foreach(var i in result){
                 if(cinematic&&Equals(i.operand,from))yield return new CodeInstruction(i){operand=to};
+                else if(restrained&&Equals(i.operand,from))yield return new CodeInstruction(i){operand=firing};
                 else yield return i;
             }
         }
+        internal static bool Restrained(WorldRumbleHooks.Producer site)=>
+            (site.Type==typeof(scrTank)&&site.Method=="fireCannon")||
+            (site.Type==typeof(scrIncinerator)&&site.Method=="onFrameAdvance")||
+            (site.Type==typeof(scrAmalgamationMesh)&&site.Method=="fireCannon")||
+            (site.Type==typeof(scrArchon)&&(site.Method=="beamSingleFire"||site.Method=="beamSweepFire"));
         private static void CinematicGameAdd(scrGameControl game,float amount,Vector3 position,bool ignoreDistance)
         {
             // Skip/load may evaluate timeline signals while native gameState is 0.

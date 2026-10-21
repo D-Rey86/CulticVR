@@ -149,4 +149,5 @@ GameplayGateTests.Run(Check,owner,p,g);
 HelicopterNearMissTests.Run(Check,owner,p,g);
 ExpansionTests.Run(Check,owner,p,g);
 ElevatorRideTests.Run(Check,owner,p,g);
+FinalRumbleTests.Run(Check,owner,p,g);
 owner.Close();Console.WriteLine($"PASS {checks} production event-consumer contracts using explicit Unity/output fixtures; native hooks/runtime gameplay still require live proof.");

@@ -26,7 +26,7 @@ internal static class ExpansionNativeTests
                 Check(original[i].operand is MethodInfo m&&(m.Name=="addShake"||m.Name=="setShake"),"Only actual native shake call replaced");
                 bool cinematic=site.Type==typeof(scrE2M0AmalgamCutscene)||site.Type==typeof(scrE2M9Cutscene);
                 var before=(MethodInfo)original[i].operand;
-                string wrapper=cinematic?"CinematicGameAdd":before.Name=="setShake"?"GameSet":"GameAdd";
+                string wrapper=cinematic?"CinematicGameAdd":ExpandedWorldRumbleHooks.Restrained(site)?"RestrainedGameAdd":before.DeclaringType==typeof(scrPlayerControl)?"PlayerAdd":before.Name=="setShake"?"GameSet":"GameAdd";
                 Check(observed[i].opcode==OpCodes.Call&&observed[i].operand is MethodInfo replacement&&replacement.Name==wrapper,"Playback-only versus regular native wrapper selection");replacements++;
             }
             Check(replacements==site.Add+site.Set+site.Player,"Exact native shake coverage");

@@ -198,3 +198,9 @@ public class scrInfectedBrute {}
 public class scrTriggerPlatformBreak {public int state;}
 
 
+
+public class scrDamageDropper {}
+
+public class scrArchonTrap {}
+
+public class scrIncinerator {}

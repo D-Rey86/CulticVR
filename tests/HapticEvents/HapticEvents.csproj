@@ -13,7 +13,7 @@
     <Compile Include="../../src/CulticVR.OpenXRControllers/HapticExpansion.cs" Link="HapticExpansion.cs" />
     <Compile Include="ExpansionTests.cs" />
     <Compile Include="../../src/CulticVR.OpenXRControllers/ElevatorRideHooks.cs" Link="ElevatorRideHooks.cs" />
-    <Compile Include="ElevatorRideTests.cs" />
+    <Compile Include="ElevatorRideTests.cs" /><Compile Include="FinalRumbleTests.cs" />
     <Compile Include="../../src/CulticVR.OpenXRControllers/HelicopterNearMiss.cs" Link="HelicopterNearMiss.cs" />
     <Compile Include="../../src/CulticVR.OpenXRControllers/HelicopterNearMissPatch.cs" Link="HelicopterNearMissPatch.cs" />
     <Compile Include="HelicopterNearMissTests.cs" />
