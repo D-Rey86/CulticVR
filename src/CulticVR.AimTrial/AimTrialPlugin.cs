@@ -16,7 +16,7 @@ using UnityEngine.XR;
 
 namespace CulticVR.AimTrial
 {
-    [BepInPlugin("culticvr.aimtrial", "CULTIC VR Controller Aim", "0.4.17")]
+    [BepInPlugin("culticvr.aimtrial", "CULTIC VR Controller Aim", "0.4.18")]
     [BepInDependency("culticvr.aimpreview")]
     [BepInDependency("culticvr.worldstereotrial")]
     public sealed partial class AimTrialPlugin : BaseUnityPlugin
@@ -198,10 +198,11 @@ namespace CulticVR.AimTrial
                 // mainCam for spawn position and launch direction; enable the
                 // same proxy in BOTH gates, preserving native spread and physics.
                 // Chapter Two: revolver11, SASG12, bolt-action14, Thompson15,
-                // pitchfork16. Native damage/spread/charge remain game-owned.
+                // pitchfork16; equipped LP42 flare17 (also used in Cultmas).
+                // Native damage/spread/charge remain game-owned.
                 if (weaponId != 0 && weaponId != 1 && weaponId != 2 && weaponId != 3 && weaponId != 4 && weaponId != 5 && weaponId != 6 &&
                     weaponId != 7 && weaponId != 8 && weaponId != 9 && weaponId != 10 && weaponId != 11 && weaponId != 12 &&
-                    weaponId != 13 && weaponId != 14 && weaponId != 15 && weaponId != 16) return false;
+                    weaponId != 13 && weaponId != 14 && weaponId != 15 && weaponId != 16 && weaponId != 17) return false;
             }
             catch { return false; }
             return UpdatePose(player);
@@ -551,7 +552,7 @@ namespace CulticVR.AimTrial
             try
             {
                 var weaponId = game.gamePlayers[player.playerID].playerLoadout[player.weapon].weaponTableID;
-                return ((weaponId == 1 || weaponId == 2 || weaponId == 3 || weaponId == 10 || weaponId == 11) && UseControllerAim(player)) ||
+                return ((weaponId == 1 || weaponId == 2 || weaponId == 3 || weaponId == 10 || weaponId == 11 || weaponId == 17) && UseControllerAim(player)) ||
                     ((weaponId == 0 || weaponId == 16) && UseThrownWeaponAim(player));
             }
             catch { return false; }

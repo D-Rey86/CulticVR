@@ -81,4 +81,5 @@ var patch=candidate.Methods.Single(m=>m.Name=="RedirectFiringReads");
 Require(patch.Body.Instructions.Count(i=>i.Operand is MethodReference m && m.Name=="FindPrimaryKnockbackRead")==1,"Missing production movement selector");
 Console.WriteLine($"PASS: production selector preserves exact SASG knockback read IL_350a; {failures} damaged contract fixtures fail without mutation. Shipping fireEvent has {original.Count} instructions.");
 Console.WriteLine("STATIC ONLY: selector execution and compiled wiring; shipping Harmony patch startup/Unity behavior not executed.");
+EquippedFlareTests.Run(compiled,game);
 static void Require(bool condition,string message){if(!condition)throw new InvalidOperationException(message);}

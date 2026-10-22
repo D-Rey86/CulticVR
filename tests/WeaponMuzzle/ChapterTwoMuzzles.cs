@@ -34,7 +34,7 @@ static class ChapterTwoMuzzles
         var firing = new[] { "sprWeaponSASG_1", "sprWeaponSASG_44",
             "sprWeaponSASGOfficer_1", "sprWeaponSASGOfficer_44",
             "sprWeaponLeeEnfield_1", "sprWeaponLeeEnfieldOfficer_1",
-            "sprThompson_1", "sprThompson_4", "sprWeaponBBGun_0", "sprWeaponBBGun_1" };
+            "sprThompson_1", "sprThompson_4", "sprWeaponBBGun_0", "sprWeaponBBGun_1", "sprLP42V2_1" };
         foreach (var name in firing) Read(name);
         var added = points.Keys.Cast<string>().Except(baseline.Keys).ToArray();
         if (added.Length != 48) throw new Exception("Unexpected new muzzle coverage");
@@ -91,7 +91,7 @@ static class ChapterTwoMuzzles
             }
             throw new Exception("Muzzle gate did not terminate");
         }
-        var allowed = new[] {1,2,3,4,5,9,10,12,14,15};
+        var allowed = new[] {1,2,3,4,5,9,10,12,14,15,17};
         for (var id = -2; id <= 32; id++)
             if (Admitted(id) != allowed.Contains(id)) throw new Exception("Muzzle weapon gate: " + id);
         Console.WriteLine($"PASS {baseline.Count} unchanged Chapter One landmarks; 48 new muzzle-only sprites; firing coverage; 35 weapon gate cases; revolver unchanged.");

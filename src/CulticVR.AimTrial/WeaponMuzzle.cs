@@ -76,7 +76,7 @@ namespace CulticVR.AimTrial
                 {
                     var id = game.gamePlayers[player.playerID].playerLoadout[player.weapon].weaponTableID;
                     if (id != 1 && id != 2 && id != 3 && id != 4 && id != 5 && id != 9 && id != 10 &&
-                        id != 12 && id != 14 && id != 15) return false;
+                        id != 12 && id != 14 && id != 15 && id != 17) return false;
                 }
                 catch { return false; }
             }
