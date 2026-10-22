@@ -10,7 +10,7 @@ using Uuvr;
 
 namespace CulticVR.WorldStereoTrial
 {
-    [BepInPlugin("culticvr.worldstereotrial", "CULTIC VR World Stereo", "0.8.6")]
+    [BepInPlugin("culticvr.worldstereotrial", "CULTIC VR World Stereo", "0.8.7")]
     [DefaultExecutionOrder(-100)]
     public sealed partial class WorldStereoTrialPlugin : BaseUnityPlugin
     {
@@ -564,6 +564,9 @@ namespace CulticVR.WorldStereoTrial
         {
             if (!scene.IsValid() || !scene.isLoaded) return false;
             var name = scene.name;
+            // The shipped Cultmas bonus map uses a lettered episode, so it
+            // needs the same world/aim/UI ownership as numbered campaigns.
+            if (string.Equals(name, "sceneEBM1", StringComparison.Ordinal)) return true;
             if (name.Length < 9 || !name.StartsWith("sceneE", System.StringComparison.Ordinal)) return false;
 
             var index = 6;
