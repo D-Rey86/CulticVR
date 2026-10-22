@@ -17,6 +17,30 @@ p.tempWeapon.tWepType=TempWeapon.TWepType.Bazooka;owner.Clear();owner.Temp(p);
 Check(owner.Output.Pulses.Single().Amplitude==1f&&owner.Output.Pulses[0].Seconds==.2f&&owner.VestOutput.Frames.Single().Front==VestMotorFrame.All&&owner.VestOutput.Frames[0].Back==0,"Rocket has strong full front-chest recoil");
 p.tempWeapon.tWepType=TempWeapon.TWepType.LP42;owner.Clear();owner.Temp(p);
 Check(owner.Output.Pulses.Single().Amplitude==.5f&&owner.VestOutput.Frames.Single().Front!=VestMotorFrame.All,"Disposable flare has distinct lighter recoil");
+// Exact output equivalence against the existing disposable LP42, including
+// independent controls, strength scaling, both modes and either weapon hand.
+int flareSlot=data.playerLoadout.Count;data.playerLoadout.Add(new scrWeapon{weaponTableID=17});
+foreach(bool left in new[]{false,true})foreach(bool alt in new[]{false,true})
+foreach(float handStrength in new[]{0f,.4f,1f})foreach(float vestStrength in new[]{0f,.9f,1f})foreach(int enabled in new[]{0,1,2,3}){
+    VrSettings.LeftWeapon=left;VrSettings.ControllerHapticStrength.Value=handStrength;VrSettings.VestHapticStrength.Value=vestStrength;
+    VrSettings.ControllerHaptics.Value=(enabled&1)!=0;VrSettings.VestHaptics.Value=(enabled&2)!=0;
+    p.tempWeapon=new TempWeapon{tWepType=TempWeapon.TWepType.LP42};owner.Clear();owner.Temp(p);
+    var referenceHands=owner.Output.Pulses.ToArray();var referenceVest=owner.VestOutput.Frames.ToArray();
+    p.tempWeapon=null;p.weapon=flareSlot;owner.Clear();owner.Fire(p,alt);
+    Check(owner.Output.Pulses.SequenceEqual(referenceHands),"Equipped normal/star flare matches disposable hand/strength/duration/toggle exactly");
+    Check(owner.VestOutput.Frames.SequenceEqual(referenceVest),"Equipped normal/star flare matches disposable chest pattern/strength/duration/toggle exactly");
+}
+VrSettings.LeftWeapon=false;VrSettings.ControllerHapticStrength.Value=VrSettings.VestHapticStrength.Value=1;
+VrSettings.ControllerHaptics.Value=VrSettings.VestHaptics.Value=true;
+foreach(bool alt in new[]{false,true}){
+    owner.Clear();owner.Fire(p,alt);
+    Check(owner.Output.Pulses.Count==1&&owner.Output.Pulses[0].Amplitude==.5f&&owner.Output.Pulses[0].Seconds==.09f&&owner.VestOutput.Frames.Count==1,"One matching90ms recoil per accepted equipped flare shot");
+    owner.Clear();g.gameState=1;owner.Fire(p,alt);g.gameState=0;owner.Tick();
+    Check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Count==0,"Paused equipped flare cannot replay feedback");
+    p.tempWeapon=new TempWeapon{tWepType=TempWeapon.TWepType.LP42};owner.Clear();owner.Fire(p,alt,()=>owner.Temp(p));
+    Check(owner.Output.Pulses.Count==1&&owner.VestOutput.Frames.Count==1,"Nested temporary callback cannot duplicate equipped flare recoil");p.tempWeapon=null;
+}
+p.weapon=1;p.tempWeapon=new TempWeapon{tWepType=TempWeapon.TWepType.LP42};
 VrSettings.LeftWeapon=true;owner.Clear();owner.Temp(p);Check(owner.Output.Pulses.Single().Left,"Disposable recoil follows left weapon mode");VrSettings.LeftWeapon=false;
 p.tempWeapon.tWepType=TempWeapon.TWepType.MG;owner.Clear();for(int i=0;i<5;i++)owner.Temp(p);
 Check(owner.Output.Pulses.Count==5&&owner.VestOutput.Frames.Count==5,"Five completed MG rounds produce five pulses");

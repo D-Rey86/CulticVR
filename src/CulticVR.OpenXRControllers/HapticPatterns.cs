@@ -96,7 +96,8 @@ namespace CulticVR.OpenXRControllers
             if(alternate && weapon!=2 && weapon!=3 && weapon!=5 && weapon!=10 && weapon!=11 && weapon!=17)return 0;
             switch(weapon) {
                 case 1:case 11:return .4f;
-                case 4:case 15:case 17:seconds=.045f;return .3f;
+                case 4:case 15:seconds=.045f;return .3f;
+                case 17:seconds=.09f;return .5f; // Match the disposable LP42 on both outputs/modes.
                 case 2:case 9:case 14:seconds=.11f;return .75f;
                 case 3:case 12:seconds=.14f;return .95f;
                 case 5:seconds=.16f;return .85f;
