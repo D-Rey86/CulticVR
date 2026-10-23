@@ -10,18 +10,26 @@ var baselineFile="tools/cultmas/backup.txt";
 Func<SceneFixture,bool>? baseline=File.Exists(baselineFile)?Compile(Path.Combine(File.ReadAllText(baselineFile).Trim(),"CulticVR.dll")):null;
 int checks=0;
 void Check(bool value,string message){checks++;if(!value)throw new Exception(message);}
+var survival=new[]{"sceneSurvivalTest","sceneSurvivalMines","sceneSurvivalAsylum","sceneSurvivalCoopTest","sceneSurvivalCrypts","sceneSurvivalMall","sceneSurvivalOldTown","sceneSurvivalTrainYard","sceneSurvivalGrandewel"};
 var accepted=new List<string>{"sceneEBM1","sceneTest"};
+accepted.AddRange(survival);
 for(int map=1;map<=10;map++)accepted.Add($"sceneE1M{map}");
 for(int map=0;map<=12;map++)accepted.Add($"sceneE2M{map}");
 foreach(var name in accepted){
  foreach(bool valid in new[]{false,true})foreach(bool loaded in new[]{false,true}){
   var scene=new SceneFixture(name,valid,loaded);
   Check(gate(scene)==(valid&&loaded),"Campaign/bonus still requires valid loaded Scene: "+name);
-  if(baseline!=null)Check(baseline(scene)==(valid&&loaded&&name!="sceneEBM1"&&name!="sceneTest"),"Baseline proves bonus exclusion and unchanged campaign cases");
+  if(baseline!=null)Check(baseline(scene)==(valid&&loaded&&name!="sceneEBM1"&&name!="sceneTest"&&!survival.Contains(name)),"Baseline proves bonus exclusion and unchanged campaign cases");
  }
 }
-var rejected=new[]{"sceneMainMenu","sceneLoading","sceneIntro","scenePreload","sceneSurvivalTest","sceneSurvivalMines","sceneSurvivalAsylum","sceneSurvivalCoopTest","sceneSurvivalCrypts","sceneSurvivalMall","sceneSurvivalOldTown","sceneSurvivalTrainYard","sceneSurvivalGrandewel","sceneEBM","sceneEBM0","sceneEBM2","sceneEBM10","sceneEBM1extra","sceneebm1","SCENEEBM1","sceneEBM1 "," sceneEBM1","sceneEBM01","sceneE1M","sceneE1","sceneEM1","sceneE1M1intro","sceneE1M-1","sceneE-1M1","sceneE１M1","sceneE1M１","", "sceneEBM1\0","scenetest","SCENETEST","sceneTest2","sceneTestExtra","sceneTest "," sceneTest","sceneTest\0"};
+var rejected=new[]{"sceneMainMenu","sceneLoading","sceneIntro","scenePreload","sceneEBM","sceneEBM0","sceneEBM2","sceneEBM10","sceneEBM1extra","sceneebm1","SCENEEBM1","sceneEBM1 "," sceneEBM1","sceneEBM01","sceneE1M","sceneE1","sceneEM1","sceneE1M1intro","sceneE1M-1","sceneE-1M1","sceneE１M1","sceneE1M１","", "sceneEBM1\0","scenetest","SCENETEST","sceneTest2","sceneTestExtra","sceneTest "," sceneTest","sceneTest\0"};
 foreach(string name in rejected){Check(!gate(new(name,true,true)),"Non-gameplay/malformed rejected: "+name);if(baseline!=null)Check(!baseline(new(name,true,true)),"Existing rejection preserved");}
+foreach(string name in survival){
+ foreach(string variant in new[]{name+"Extra",name+" "," "+name,name.ToLowerInvariant(),name.ToUpperInvariant(),name+"\0"})
+  Check(!gate(new(variant,true,true)),"Survival names require exact ordinal whole-name match");
+}
+foreach(string name in new[]{"sceneSurvival","sceneSurvivalUnknown","sceneSurvivalTest2","sceneSurvivalTestMenu"})
+ Check(!gate(new(name,true,true)),"Survival prefix alone cannot enable unknown scenes");
 // Numbered grammar remains deliberately unchanged, including multi-digit IDs.
 for(int e=0;e<=20;e++)for(int m=0;m<=30;m++){
  string name=$"sceneE{e}M{m}";Check(gate(new(name,true,true)),"Numbered scene grammar retained");
@@ -35,10 +43,18 @@ if(File.Exists(demoBackup)){
  var beforeDemo=Compile(Path.Combine(File.ReadAllText(demoBackup).Trim(),"CulticVR.dll"));
  foreach(var name in accepted.Concat(rejected))foreach(bool valid in new[]{false,true})foreach(bool loaded in new[]{false,true}){
   var fixture=new SceneFixture(name,valid,loaded);
-  Check(beforeDemo(fixture)==(accepted.Contains(name)&&name!="sceneTest"&&valid&&loaded),"Immediate baseline reproduces Demo exclusion with Cultmas working");
+  Check(beforeDemo(fixture)==(accepted.Contains(name)&&name!="sceneTest"&&!survival.Contains(name)&&valid&&loaded),"Immediate baseline reproduces Demo exclusion with Cultmas working");
  }
 }
-Console.WriteLine($"PASS {checks} production compiled gameplay-scene cases; Cultmas and 2021 Demo accepted, prior campaign/menu/loading/survival behavior preserved. No Unity/headset visual proof.");
+var survivalBackup="tools/survival-stereo/backup.txt";
+if(File.Exists(survivalBackup)){
+ var beforeSurvival=Compile(Path.Combine(File.ReadAllText(survivalBackup).Trim(),"CulticVR.dll"));
+ foreach(var name in accepted.Concat(rejected))foreach(bool valid in new[]{false,true})foreach(bool loaded in new[]{false,true}){
+  var fixture=new SceneFixture(name,valid,loaded);
+  Check(beforeSurvival(fixture)==(accepted.Contains(name)&&!survival.Contains(name)&&valid&&loaded),"Immediate baseline reproduces all survival exclusions with campaign/bonus working");
+ }
+}
+Console.WriteLine($"PASS {checks} production compiled gameplay-scene cases; all nine survival scenes, Cultmas and 2021 Demo accepted; campaign/menu/loading guards preserved. No Unity/headset visual proof.");
 
 static Func<SceneFixture,bool> Compile(string path){
  using var assembly=AssemblyDefinition.ReadAssembly(path);

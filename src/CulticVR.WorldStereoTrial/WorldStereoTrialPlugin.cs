@@ -10,7 +10,7 @@ using Uuvr;
 
 namespace CulticVR.WorldStereoTrial
 {
-    [BepInPlugin("culticvr.worldstereotrial", "CULTIC VR World Stereo", "0.8.8")]
+    [BepInPlugin("culticvr.worldstereotrial", "CULTIC VR World Stereo", "0.8.9")]
     [DefaultExecutionOrder(-100)]
     public sealed partial class WorldStereoTrialPlugin : BaseUnityPlugin
     {
@@ -568,6 +568,18 @@ namespace CulticVR.WorldStereoTrial
             // (named sceneTest) share the numbered campaigns' gameplay path.
             if (string.Equals(name, "sceneEBM1", StringComparison.Ordinal) ||
                 string.Equals(name, "sceneTest", StringComparison.Ordinal)) return true;
+            // Exact shipped survival scenes; the prefix only avoids checking
+            // this list on campaign/menu frames. Unknown names remain excluded.
+            if (name.StartsWith("sceneSurvival", StringComparison.Ordinal))
+                return string.Equals(name, "sceneSurvivalTest", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalMines", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalAsylum", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalCoopTest", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalCrypts", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalMall", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalOldTown", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalTrainYard", StringComparison.Ordinal) ||
+                    string.Equals(name, "sceneSurvivalGrandewel", StringComparison.Ordinal);
             if (name.Length < 9 || !name.StartsWith("sceneE", System.StringComparison.Ordinal)) return false;
 
             var index = 6;
