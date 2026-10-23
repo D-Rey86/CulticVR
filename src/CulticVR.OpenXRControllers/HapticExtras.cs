@@ -14,7 +14,7 @@ namespace CulticVR.OpenXRControllers
         private GameObject? _hapticCutsceneObject;
         private scrCutsceneTrigger? _hapticCutscene;
         private AccessTools.FieldRef<scrCutsceneTrigger,int>? _hapticCutsceneState;
-        private struct MeleeContactState { internal scrPlayerControl? Player;internal bool Charged,Hit; }
+        private struct MeleeContactState { internal scrPlayerControl? Player;internal bool Charged,Hit,Left; }
         [ThreadStatic] private static MeleeContactState _meleeContact;
         private void InitializeExtraHaptics()
         {
@@ -86,13 +86,13 @@ namespace CulticVR.OpenXRControllers
             var loadout=g.gamePlayers[p.playerID].playerLoadout;
             if(p.weapon<0||p.weapon>=loadout.Count||loadout[p.weapon]==null)return;
             int id=loadout[p.weapon].weaponTableID;
-            if(id==0||id==7||id==13||id==16)_meleeContact=new MeleeContactState{Player=p,Charged=charge>20f};
+            if(id==0||id==7||id==13||id==16)_meleeContact=new MeleeContactState{Player=p,Charged=charge>20f,Left=VrSettings.LeftWeapon};
         }
         private static void MeleeContact(scrPlayerControl __instance)
         {
             if(_meleeContact.Player!=__instance||_meleeContact.Hit||_hapticOwner==null||!Eligible(__instance,scrGameControl.Instance))return;
             _meleeContact.Hit=true;
-            _hapticOwner.PulseControllers(false,false,_meleeContact.Charged?1f:.55f,_meleeContact.Charged?.16f:.08f);
+            _hapticOwner.PulseControllers(_meleeContact.Left,false,_meleeContact.Charged?1f:.55f,_meleeContact.Charged?.16f:.08f);
         }
         private static IEnumerable<CodeInstruction> PickupTranspiler(IEnumerable<CodeInstruction> instructions)=>
             HapticEventSelectors.AfterCall(instructions,AccessTools.Method(typeof(scrGameControl),"playSystemSound"),AccessTools.Method(typeof(OpenXRControllersPlugin),nameof(PickupAccepted)),1,1);

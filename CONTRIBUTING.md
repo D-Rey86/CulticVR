@@ -27,7 +27,7 @@ Other test projects require local Unity/game references; pass `-p:GameDir='your 
 .\packaging\Build-Release.ps1 -GameDir 'D:\SteamLibrary\steamapps\common\CULTIC' -Version '1.1.0' -Draft
 ```
 
-This exports an explicit source tree into ignored `artifacts`, builds it, checks release hygiene and creates a mod ZIP/checksum. It does not publish, deploy or launch the game. `-Draft` marks an unapproved package nonpublic; omit it only after release review.
+This exports an explicit source tree into ignored `artifacts`, builds it, checks release hygiene and creates the Windows installer ZIP, matching source ZIP, source inventory and archive checksums. The player ZIP includes README, release notes, notices, dependency sources and the installer. It does not publish, deploy or launch the game. `-Draft` marks an unapproved package nonpublic; omit it only after release review.
 
 Maintainers fetch hash-pinned dependencies and source snapshots before building. The player ZIP bundles the required components, notices and GPL/LGPL sources; it works offline. The native Windows Forms installer uses the tested PowerShell transaction engine internally with no terminal window or command entry. Development history contains personal paths, author information and investigation material; use the reviewed source export for a new public repository while preserving the development repository. Publish the exact source corresponding to each release binary.
 

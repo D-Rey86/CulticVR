@@ -1,11 +1,12 @@
-# CULTIC VR 1.1.0 â€” Chapter Two and haptics
+# CULTIC VR 1.1.0 — campaigns, bonus maps, survival and haptics
 
-Adds Chapter Two support while retaining Chapter One and Interlude gameplay. All weapons and bHaptics have been confirmed working during the maintainer's near-complete playthrough; the final level remains unfinished at release preparation time.
+Adds Chapter Two support while retaining Chapter One and Interlude gameplay. Stereo, head tracking and controller gameplay also recognize I'll Be Home for Cultmas, the Original 2021 Demo Map and all shipped survival scenes. Maintainer gameplay testing has confirmed the bonus map fixes, all selectable survival maps, weapon types and bHaptics on the tested setup.
 
-- Controller aiming and muzzle placement for the bolt-action rifle, Thompson, SASG, BB gun, revolver, pitchfork and night stick, including scoped rifle aiming and limited-use weapons.
+- Controller aiming and muzzle placement for the bolt-action rifle, Thompson, SASG, BB gun, revolver, pitchfork and night stick, including scoped rifle aiming and limited-use weapons. The equipped LP42 flare gun uses controller aiming and its measured barrel origin in both normal and star-flare modes; both modes match disposable LP42 controller/vest recoil.
 - Chapter Two automap on a larger stationary VR panel: look at your weapon-hand palm to toggle it. The wrist radial wheel now also requires looking at the offhand, preventing accidental capture outside your view.
-- Motion-controller feedback for firearms, successful melee contacts, incoming damage, explosions and supported world impacts, with its own strength control.
+- Motion-controller feedback for firearms, successful melee contacts, incoming damage, explosions and supported world impacts, with its own strength control. Melee contact feedback follows the selected weapon hand, preserves normal/charged strength, and remains silent on misses.
 - Optional bHaptics TactSuit feedback: weapon recoil, directional incoming attacks, pickups, healing, explosions, supported cinematic/world impacts and a fast heartbeat at 25 health or less. Explosions stay strong at any distance. TactSuit X40 tested; enable the option with Player and the vest connected. Vest feedback defaults off and has an independent strength slider.
+- Elevator travel rumble while riding cargo, enclosed freight, office and dumbwaiter lifts, with smaller lifts gentler. Additional falling-object landings, boss trap/landing events and restrained heavy enemy firing rumble use both vest and controllers.
 - Flashlight and held throwables follow head pitch and yaw. Improved Chapter Two/Interlude opening cinematic presentation and wrist HUD restoration after loading saves.
 - Automatic zero-light write suppression and palette optimization on supported D3D11 shaders. Deferred Rendering remains optional and off by default; it removes fog in tested areas and can change lighting/transparency.
 
@@ -15,4 +16,4 @@ Tested with Quest 3, Virtual Desktop, NVIDIA RTX 5070 Ti and TactSuit X40. Other
 
 The download contains no performance recorder, research probes, personal settings, game assemblies or extracted artwork. GPL-3.0-or-later mod source, dependency sources/notices and SHA256SUMS accompany the package. The native rendering helper is embedded in CulticVR.dll.
 
-Validation includes a fresh source-export build, package hygiene, managed/static/native replay coverage, installer transactions and offscreen layout checks. These supplement the reported gameplay testing and do not certify untested hardware or the unfinished final level. This is a local release candidate until publication is approved.
+Validation includes a fresh source-export build, package hygiene, managed/static/native replay coverage, installer transactions and offscreen layout checks. These supplement the reported gameplay testing and do not certify every event/map/weapon combination or untested hardware. Left-hand melee routing has automated verification; physical confirmation of that final change is still pending. Publication is separate from building this package.

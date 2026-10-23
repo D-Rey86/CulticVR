@@ -48,6 +48,7 @@ foreach ($name in @('README.md','LICENSE','THIRD-PARTY-NOTICES.md','CONTRIBUTING
     $path = Join-Path $repo $name
     if (Test-Path -LiteralPath $path) { Copy-Item -LiteralPath $path -Destination $package }
 }
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'RELEASE-NOTES.md') -Destination $package
 if ($Draft) { 'LOCAL RELEASE CANDIDATE: publication pending.' | Set-Content -LiteralPath (Join-Path $package 'DRAFT-NOT-FOR-PUBLICATION.txt') }
 $zip = Join-Path $output ('CulticVR-' + $Version + '-windows-x64.zip')
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip

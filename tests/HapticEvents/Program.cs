@@ -108,18 +108,29 @@ bytes=GC.GetAllocatedBytesForCurrentThread();for(int i=0;i<10000;i++)timer.Tick(
 Check(bytes==0,"Repeated heartbeat emissions allocate no managed memory in scheduler");
 // New contact/world event contracts (production callbacks with explicit output fixtures).
 owner.Use();data.playerHP=100;g.hudScript.playerScript=p;owner.Tick();
-foreach(int id in new[]{0,7,13,16}){
+foreach(int id in new[]{0,7,13,16})foreach(bool left in new[]{false,true}){
+    VrSettings.LeftWeapon=left;
     data.playerLoadout.Add(new scrWeapon{weaponTableID=id});p.weapon=data.playerLoadout.Count-1;
-    owner.Clear();p.fireCharge=0;owner.Fire(p);Check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Count==0,"Melee miss silent");
+    owner.Clear();p.fireCharge=0;owner.Fire(p);Check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Count==0,"Melee miss silent in either hand mode");
     owner.Fire(p,during:()=>{owner.Contact(p);owner.Contact(p);});
-    Check(owner.Output.Pulses.Count==1&&!owner.Output.Pulses[0].Left&&owner.Output.Pulses[0].Amplitude==.55f&&owner.VestOutput.Frames.Count==0,"One physical right-controller contact, no vest");
-    owner.Clear();p.fireCharge=21;VrSettings.LeftWeapon=true;
-    owner.Fire(p,during:()=>{p.fireCharge=0;owner.Contact(p);});
-    Check(owner.Output.Pulses.Single().Amplitude==1&&owner.Output.Pulses[0].Seconds==.16f&&!owner.Output.Pulses[0].Left,"Charged snapshot survives native reset; physical right hand");VrSettings.LeftWeapon=false;
+    Check(owner.Output.Pulses.Count==1&&owner.Output.Pulses[0].Left==left&&owner.Output.Pulses[0].Amplitude==.55f&&owner.Output.Pulses[0].Seconds==.08f&&owner.VestOutput.Frames.Count==0,"One normal contact in selected weapon hand, no vest");
+    owner.Clear();p.fireCharge=21;
+    owner.Fire(p,during:()=>{p.fireCharge=0;VrSettings.LeftWeapon=!left;owner.Contact(p);owner.Contact(p);});
+    Check(owner.Output.Pulses.Count==1&&owner.Output.Pulses[0].Amplitude==1&&owner.Output.Pulses[0].Seconds==.16f&&owner.Output.Pulses[0].Left==left&&owner.VestOutput.Frames.Count==0,"Charged/hand snapshot survives native reset and hand setting change");VrSettings.LeftWeapon=left;
     owner.Clear();owner.Fire(p,true,()=>owner.Contact(p));Check(owner.Output.Pulses.Count==0,"Alternate throw not melee contact");
     try{owner.Fire(p,during:()=>throw new InvalidOperationException());}catch(InvalidOperationException){}
-    owner.Contact(p);Check(owner.Output.Pulses.Count==0,"Exception restores contact scope");
+    owner.Contact(p);Check(owner.Output.Pulses.Count==0,"Exception restores contact scope in either hand mode");
+    foreach(float strength in new[]{0f,.4f,1f}){
+        owner.Clear();p.fireCharge=0;VrSettings.ControllerHapticStrength.Value=strength;owner.Fire(p,during:()=>owner.Contact(p));
+        Check(strength==0?owner.Output.Pulses.Count==0:owner.Output.Pulses.Count==1&&owner.Output.Pulses[0].Left==left&&Math.Abs(owner.Output.Pulses[0].Amplitude-.55f*strength)<.00001f,"Melee selected hand honors independent controller strength");
+    }
+    VrSettings.ControllerHapticStrength.Value=1;
+    owner.Clear();VrSettings.ControllerHaptics.Value=false;owner.Fire(p,during:()=>owner.Contact(p));VrSettings.ControllerHaptics.Value=true;
+    Check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Count==0,"Disabled melee haptics silent");
+    owner.Clear();g.gameState=1;owner.Fire(p,during:()=>owner.Contact(p));g.gameState=0;owner.Tick();
+    Check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Count==0,"Paused contacts cannot replay on resume");
 }
+VrSettings.LeftWeapon=false;
 owner.Clear();p.weapon=0;owner.Fire(p,during:()=>owner.Contact(p));Check(owner.Output.Pulses.Count==1,"Gun contact does not add melee output");
 owner.Clear();owner.Pickup(new Collider{gameObject=p.gameObject});Check(owner.Output.Pulses.Count==0&&owner.VestOutput.Frames.Single().Amplitude==.4f,"Small vest-only accepted pickup");
 var pickup=owner.VestOutput.Frames.Single();
