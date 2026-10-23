@@ -11,13 +11,13 @@ Version **1.1.0** adds Chapter Two and bonus/survival map support, controller ai
 - Windows 10/11. The download includes BepInEx **5.4.23.5**, UUVR **0.4.0**, and required x64 OpenXR components.
 - No separate mod-loader downloads, terminal commands or .NET SDK are needed.
 
-Headset testing has used Quest 3 through Virtual Desktop with an NVIDIA RTX 5070 Ti, and a TactSuit X40 for optional vest feedback. Maintainer gameplay testing has confirmed the weapon types and bHaptics, the Cultmas and 2021 Demo fixes, and all selectable survival maps. The code uses runtime-provided eye geometry and resolution; other headsets, AMD GPUs and advanced quad-view/foveated configurations have not been visually certified. Virtual Desktop is not a code-level requirement. Chapter Two requires the game's corresponding DLC. Multiplayer is unsupported.
+Headset testing has used Quest 3 through Virtual Desktop with an NVIDIA RTX 5070 Ti, and a TactSuit X40 for optional vest feedback. Maintainer gameplay testing has confirmed the weapon types and bHaptics, the Cultmas and 2021 Demo fixes, and all selectable survival maps. Normal and charged melee haptics have also been confirmed in Left Hand Mode. The code uses runtime-provided eye geometry and resolution; other headsets, AMD GPUs and advanced quad-view/foveated configurations have not been visually certified. Virtual Desktop is not a code-level requirement. Chapter Two requires the game's corresponding DLC. Multiplayer is unsupported.
 
 ## Installation
 
 1. Download **CulticVR-1.1.0-windows-x64.zip** from Releases and **extract the entire ZIP**.
 2. Close CULTIC, then double-click **Install CulticVR.exe** in the extracted folder.
-3. The installer finds CULTIC in your Steam libraries. If it does not, click **Browse** and select `CULTIC.exe` (Steam → CULTIC → Manage → Browse local files).
+3. The installer finds CULTIC in your Steam libraries. If it does not, click **Browse** and select `CULTIC.exe` (Steam â†’ CULTIC â†’ Manage â†’ Browse local files).
 4. Click **Install / Update**. Everything needed for the mod is already included; installation works offline.
 5. Make your headset available with its OpenXR runtime selected, then launch CULTIC through Steam.
 
@@ -27,7 +27,7 @@ Start with a clean game installation. The installer refuses conflicting existing
 
 Everything you need is in the same download. Use File Explorer for these steps; no commands or additional downloads are required.
 
-1. Close CULTIC and open its game folder through **Steam → CULTIC → Manage → Browse local files**. This is the folder containing `CULTIC.exe`. Start with a clean installation without another BepInEx/UUVR setup.
+1. Close CULTIC and open its game folder through **Steam â†’ CULTIC â†’ Manage â†’ Browse local files**. This is the folder containing `CULTIC.exe`. Start with a clean installation without another BepInEx/UUVR setup.
 2. Open the extracted mod download's **payload** folder. Extract **BepInEx_win_x64_5.4.23.5.zip** into a temporary folder, then copy **all its contents** directly into the game folder. `winhttp.dll` and `doorstop_config.ini` must sit beside `CULTIC.exe`, with a `BepInEx` folder beside them.
 3. Extract **uuvr-mono-modern.zip** from **payload** into another temporary folder. Copy its **patchers** and **plugins** folders into the game's **BepInEx** folder. Merge the folders when prompted. The result must include `BepInEx/plugins/Uuvr.dll` and `BepInEx/patchers/Uuvr.Patcher.dll`; do not create a second nested `BepInEx` folder.
 4. Copy **payload/CulticVR.dll** into the game's **BepInEx/plugins** folder.
@@ -66,7 +66,7 @@ Older development/manual installations need their original removal procedure bef
 - Higher resolution, nonneutral brightness and VR rendering passes can increase GPU cost. Baked world occlusion is disabled to prevent previously observed one-eye disappearing geometry; reenabling it is not an established safe performance fix.
 - Experimental hidden-world geometry optimization and physical TNT throwing are both OFF by default.
 - Small tracking-origin recenter changes can shift viewpoint/height; yaw recentering can rotate the in-game body. Keep UUVR's default `RelativeTransform` tracking mode.
-- Gameplay reports cover the supported map groups and weapon types, but every event and level/weapon/headset combination has not been exhaustively tested. The latest left-hand melee routing change has automated verification; its physical feel still needs confirmation.
+- Gameplay reports cover the supported map groups and weapon types, but every event and level/weapon/headset combination has not been exhaustively tested.
 - Additional OpenXR layers and other mods may change behavior. Reports should identify them without assuming they caused the problem.
 
 ## Reporting problems

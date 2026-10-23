@@ -1,4 +1,4 @@
-# CULTIC VR 1.1.0 — campaigns, bonus maps, survival and haptics
+# CULTIC VR 1.1.0 â€” campaigns, bonus maps, survival and haptics
 
 Adds Chapter Two support while retaining Chapter One and Interlude gameplay. Stereo, head tracking and controller gameplay also recognize I'll Be Home for Cultmas, the Original 2021 Demo Map and all shipped survival scenes. Maintainer gameplay testing has confirmed the bonus map fixes, all selectable survival maps, weapon types and bHaptics on the tested setup.
 
@@ -16,4 +16,4 @@ Tested with Quest 3, Virtual Desktop, NVIDIA RTX 5070 Ti and TactSuit X40. Other
 
 The download contains no performance recorder, research probes, personal settings, game assemblies or extracted artwork. GPL-3.0-or-later mod source, dependency sources/notices and SHA256SUMS accompany the package. The native rendering helper is embedded in CulticVR.dll.
 
-Validation includes a fresh source-export build, package hygiene, managed/static/native replay coverage, installer transactions and offscreen layout checks. These supplement the reported gameplay testing and do not certify every event/map/weapon combination or untested hardware. Left-hand melee routing has automated verification; physical confirmation of that final change is still pending. Publication is separate from building this package.
+Validation includes a fresh source-export build, package hygiene, managed/static/native replay coverage, installer transactions and offscreen layout checks. These supplement the reported gameplay testing and do not certify every event/map/weapon combination or untested hardware. Normal and charged melee haptics have also been confirmed in Left Hand Mode.
